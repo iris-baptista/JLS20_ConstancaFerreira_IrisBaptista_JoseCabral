@@ -100,7 +100,19 @@ object Stone extends Enumeration{
   }*/
 
   def main(args: Array[String]): Unit = {
-    println("amongus")
+    //testes
+    val board = List(List(Stone.Empty, Stone.Empty), List(Stone.Empty, Stone.Empty)) //cria um 2x2
+    val player = Stone.Black
+    val cNova = (0, 1)
+    val cLivres = List((0, 1), (2, 1), (0, 0))
+
+    val (newBoard, newLivres)= Stone.play(board, player, cNova, cLivres)
+    println(newLivres)
+    println(newBoard.getOrElse(None))
+
+    val (nextBoard, nextLivres) = Stone.play(newBoard.get, player, (4, 5), newLivres)
+    println(newLivres)
+    println(nextBoard.getOrElse(None))
   }
 
 }
