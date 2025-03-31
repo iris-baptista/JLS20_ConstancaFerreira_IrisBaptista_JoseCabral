@@ -1,6 +1,5 @@
 import scala.util.Random
 import scala.annotation.tailrec
-import scala.io.StdIn.readLine
 
 object Stone extends Enumeration{
   type Board = List[List[Stone]]
@@ -9,12 +8,6 @@ object Stone extends Enumeration{
   type Stone = Value
   val Black,White,Empty = Value
 
-  class MyRandom {
-    def tirarRandao(max: Int): (Int, MyRandom) = {
-      val randNum = Random.nextInt(max) // Gera um randu de 0 a (max - 1), q sera o size()
-      (randNum, this)
-    }
-  }
   //T1
   //ze :D
   //gerar uma coordenada aleatória
@@ -26,7 +19,14 @@ object Stone extends Enumeration{
   //      0  0  0
   // nao sei usar o randão ;_;
 
-  def randomMove(lstOpenCoords: List[Coord2D], rand:MyRandom):(Coord2D, MyRandom) = {
+  class MyRandom {
+    def tirarRandao(max: Int): (Int, MyRandom) = {
+      val randNum = Random.nextInt(max) // Gera um randu de 0 a (max - 1), q sera o size()
+      (randNum, this)
+    }
+  }
+
+  def randomMove(lstOpenCoords: List[Coord2D], rand: MyRandom): (Coord2D, MyRandom) = {
     val (index, newRand) = rand.tirarRandao(lstOpenCoords.size)
     (lstOpenCoords(index), newRand)
 
@@ -138,8 +138,16 @@ object Stone extends Enumeration{
   }
 
   def main(args: Array[String]): Unit = {
-    val board = List(List(Black, White, Empty),List(Empty,White,Black), List(White,Empty,Black))
-    printBoard(board)
-    //playRandomly(board, )
+    val lstOpenCoords: List[Coord2D] = List(
+      (0, 0), (0, 1), (0, 2),
+      (1, 0), (1, 2),
+      (2, 0), (2, 1), (2, 2)
+    ) //xd
+
+    val rand = new MyRandom()
+
+    val (coord, _) = randomMove(lstOpenCoords, rand)
+
+    println(s"Coordenada aleatória escolhida: $coord")
   }
 }
