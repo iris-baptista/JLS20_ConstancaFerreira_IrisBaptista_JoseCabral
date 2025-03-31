@@ -1,4 +1,6 @@
 import scala.util.Random
+import scala.annotation.tailrec
+import scala.io.StdIn.readLine
 
 object Stone extends Enumeration{
   type Board = List[List[Stone]]
