@@ -13,7 +13,6 @@ object Stone extends Enumeration{
       (randNum, this)
     }
   }
-
   //T1
   //ze :D
   //gerar uma coordenada aleatória
@@ -25,7 +24,6 @@ object Stone extends Enumeration{
   //      0  0  0
   // nao sei usar o randão ;_;
 
-
   def randomMove(lstOpenCoords: List[Coord2D], rand:MyRandom):(Coord2D, MyRandom) = {
     val (index, newRand) = rand.tirarRandao(lstOpenCoords.size)
     (lstOpenCoords(index), newRand)
@@ -35,11 +33,11 @@ object Stone extends Enumeration{
     //isto nao está como poo, onde tu darias a coordenada propria da cena e ele gerava a lista das coordenadas possiveis
   }
 
-
   //T2
   def play(board:Board, player:Stone, coord:Coord2D, lstOpenCoords:List[Coord2D]):(Option[Board], List[Coord2D]) = {
     (None,lstOpenCoords)
   }
+
 
   //T3
   def playRandomly(board:Board, r:MyRandom, player:Stone, lstOpenCoords:List[Coord2D], f:(List[Coord2D], MyRandom) => (Coord2D, MyRandom)):
