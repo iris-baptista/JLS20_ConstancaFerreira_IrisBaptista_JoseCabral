@@ -34,10 +34,81 @@ object Stone extends Enumeration{
   }
 
   //T2
-  def play(board:Board, player:Stone, coord:Coord2D, lstOpenCoords:List[Coord2D]):(Option[Board], List[Coord2D]) = {
-    (None,lstOpenCoords)
-  }
+  //devolve None se a cNova for invalida, devolve um board caso contrario
+  //tb devolve uma lista de coordenadas livres
+  def play(board: Board, player: Stone, cNova: Coord2D, cLivres: List[Coord2D]): (Option[Board], List[Coord2D]) = {
+    @tailrec
+    def inList(restantes: List[Coord2D]): Boolean = { //verificar se cNova esta em cLivres
+      restantes match {
+        case Nil => false
+        case x :: xs => //se so falta um, xs e Nil
+          if (x == cNova) {
+            true
+          }
+          else {
+            inList(xs)
+          }
+      }
+    }
 
+    def removeC(oldList: List[Coord2D]): List[Coord2D] = { //devolve lista sem cNova
+      oldList match {
+        case Nil => Nil
+        case x :: xs =>
+          if (x != cNova) {
+            x :: removeC(xs)
+          }
+          else {
+            removeC(xs)
+          }
+      }
+    }
+
+    def addToBoard(oldBoard: Board): Board = { //devolve board com player
+      val linha = cNova._1
+      val coluna = cNova._2
+
+      def searchBoard(remainingBoard: Board, currentLine: Int): Board = {
+        remainingBoard match { //vai a procura da linha
+          case Nil => Nil
+          case x :: xs =>
+            if (currentLine == linha) {
+              val newLine = alterLine(x, 0)
+              newLine :: xs
+            }
+            else {
+              x :: searchBoard(xs, currentLine + 1)
+            }
+        }
+      }
+
+      def alterLine(l: List[Stone], currentCol: Int): List[Stone] = { //vai a procura da coluna
+        l match {
+          case Nil => Nil
+          case x :: xs =>
+            if (currentCol == coluna) {
+              player :: xs
+            }
+            else {
+              x :: alterLine(xs, currentCol + 1)
+            }
+        }
+      }
+
+      val novoBoard = searchBoard(oldBoard, 0) //assumir q comecamos a contar em 0
+      novoBoard //devolve board com stone nova
+    }
+
+    if (inList(cLivres)) { //se tiver
+      val newLivres = removeC(cLivres) //remover cNova de cLivres (nova lista a devolver)
+      val newBoard = addToBoard(board) //adicionar stone ao board (novo board a devolver)
+
+      (Some(newBoard), newLivres) //devia alterar o quadro de alguma forma?
+    }
+    else { //se nao tiver, devolver none e a lista como esta
+      (None, cLivres)
+    }
+  }
 
   //T3
   def playRandomly(board:Board, r:MyRandom, player:Stone, lstOpenCoords:List[Coord2D], f:(List[Coord2D], MyRandom) => (Coord2D, MyRandom)):
