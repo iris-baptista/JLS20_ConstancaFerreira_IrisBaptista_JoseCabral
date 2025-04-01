@@ -1,5 +1,5 @@
-import scala.util.Random
 import scala.annotation.tailrec
+import scala.util.Random
 
 object Stone extends Enumeration{
   type Board = List[List[Stone]]
@@ -138,16 +138,17 @@ object Stone extends Enumeration{
   }
 
   def main(args: Array[String]): Unit = {
-    val lstOpenCoords: List[Coord2D] = List(
-      (0, 0), (0, 1), (0, 2),
-      (1, 0), (1, 2),
-      (2, 0), (2, 1), (2, 2)
-    ) //xd
-
-    val rand = new MyRandom()
-
-    val (coord, _) = randomMove(lstOpenCoords, rand)
-
-    println(s"Coordenada aleatória escolhida: $coord")
+//    val lstOpenCoords: List[Coord2D] = List(
+//      (0, 0), (0, 1), (0, 2),
+//      (1, 0), (1, 2),
+//      (2, 0), (2, 1), (2, 2)
+//    ) //xd
+//
+//    val rand = new MyRandom()
+//
+//    val (coord, _) = randomMove(lstOpenCoords, rand)
+//
+//    println(s"Coordenada aleatória escolhida: $coord")
+    println("ze")
   }
 }
