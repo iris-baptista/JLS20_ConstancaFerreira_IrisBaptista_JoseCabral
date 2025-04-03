@@ -15,6 +15,15 @@ object Engine {
   //      0  0  0
   // nao sei usar o randão ;_;
 
+  case class MyRandom(seed: Long) extends Random { //tirada dos slides
+    def nextInt: (Int, Random) = {
+      val newSeed = (seed * 0x5DEECE66DL + 0xBL) &
+        0xFFFFFFFFFFFFL
+      val nextRandom = MyRandom(newSeed)
+      val n = (newSeed >>> 16).toInt
+      (n, nextRandom)
+    }
+  }
   def tirarRandao(max: Int, rand: Random): (Int, Random) = {
     val newRand = new Random(rand.nextLong()) // Gera nova seed para manter imutabilidade
 
@@ -112,8 +121,8 @@ object Engine {
   }
 
   //T3
-  def playRandomly(board: Board, r: Random, player: Stone, lstOpenCoords: List[Coord2D], f: (List[Coord2D], Random) => (Coord2D, Random)):
-  (Board, Random, List[Coord2D]) = {
+  def playRandomly(board: Board, r: MyRandom, player: Stone, lstOpenCoords: List[Coord2D], f: (List[Coord2D], MyRandom) => (Coord2D, MyRandom)):
+  (Board, MyRandom, List[Coord2D]) = {
     val (coord, newR) = f(lstOpenCoords, r) // validate
     val (optBoard, newLstOpenCoords) = play(board, player, coord, lstOpenCoords)
     val newBoard = optBoard.getOrElse(None)
@@ -153,7 +162,7 @@ object Engine {
 
 
     val board = Board.empty
-    val rand = new Random()
+    val rand = new MyRandom()
 
     val lstOpenCoords: List[Coord2D] = List(
       (0, 0), (0, 1), (0, 2),
