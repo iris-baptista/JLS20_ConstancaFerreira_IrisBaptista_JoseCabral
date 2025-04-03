@@ -1,12 +1,10 @@
+import Stone.Stone
 import scala.annotation.tailrec
 import scala.util.Random
-//stone devia ser um enumerado se clhar lol
-object Stone extends Enumeration{
-  type Board = List[List[Stone]]
-  type Coord2D = (Int,Int)
 
-  type Stone = Value
-  val Black,White,Empty = Value
+object GameEngine {
+  type Board = List[List[Stone]]
+  type Coord2D = (Int, Int)
 
   //T1
   //ze :D
@@ -113,12 +111,12 @@ object Stone extends Enumeration{
   }
 
   //T3
-  def playRandomly(board:Board, r:MyRandom, player:Stone, lstOpenCoords:List[Coord2D], f:(List[Coord2D], MyRandom) => (Coord2D, MyRandom)):
+  def playRandomly(board: Board, r: MyRandom, player: Stone, lstOpenCoords: List[Coord2D], f: (List[Coord2D], MyRandom) => (Coord2D, MyRandom)):
   (Board, MyRandom, List[Coord2D]) = {
-    val (coord,newR) = f(lstOpenCoords,r) // validate
-    val (optBoard,newLstOpenCoords) = play(board, player, coord, lstOpenCoords)
+    val (coord, newR) = f(lstOpenCoords, r) // validate
+    val (optBoard, newLstOpenCoords) = play(board, player, coord, lstOpenCoords)
     val newBoard = optBoard.getOrElse(None)
-    if(newBoard == None) {
+    if (newBoard == None) {
       (board, newR, newLstOpenCoords)
     } else {
       val newBoard = optBoard.get
@@ -127,12 +125,12 @@ object Stone extends Enumeration{
   }
 
   //T4
-  def printBoard(board:Board): Unit = {
+  def printBoard(board: Board): Unit = {
     board.foreach { row =>
-      println(row.map{
-        case Black => "B"
-        case White => "W"
-        case Empty => "-"
+      println(row.map {
+        case Stone.Black => "B"
+        case Stone.White => "W"
+        case Stone.Empty => "-"
       }.mkString(" "))
     }
   }
@@ -149,6 +147,12 @@ object Stone extends Enumeration{
     //    val (coord, _) = randomMove(lstOpenCoords, rand)
     //
     //    println(s"Coordenada aleatória escolhida: $coord")
-    println("ze")
+    //println("ze")
+
+    val board = List(List(Stone.Black, Stone.White, Stone.Empty),
+      List(Stone.Empty, Stone.White, Stone.Black),
+      List(Stone.White, Stone.Empty, Stone.Black))
+
+    printBoard(board)
   }
 }
