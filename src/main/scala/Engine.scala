@@ -1,7 +1,8 @@
-import Stone.{Black, Board, Coord2D, Empty, White}
 
-import scala.annotation.tailrec
+import Stone.Stone
 import MyRandom._
+import scala.annotation.tailrec
+
 
 object Engine {
   //T1
