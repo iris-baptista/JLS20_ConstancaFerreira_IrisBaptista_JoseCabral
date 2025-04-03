@@ -15,24 +15,27 @@ object Engine {
   //      0  0  0
   // nao sei usar o randão ;_;
 
-  case class MyRandom(seed: Long) extends Random { //tirada dos slides
-    def nextInt: (Int, Random) = {
-      val newSeed = (seed * 0x5DEECE66DL + 0xBL) &
-        0xFFFFFFFFFFFFL
-      val nextRandom = MyRandom(newSeed)
-      val n = (newSeed >>> 16).toInt
-      (n, nextRandom)
+  def getLeftMost(num: Int): Int = {
+    if(num < 10){
+      return num
     }
-  }
-  def tirarRandao(max: Int, rand: Random): (Int, Random) = {
-    val newRand = new Random(rand.nextLong()) // Gera nova seed para manter imutabilidade
-
-    (rand.nextInt(max), newRand)
+    else{
+      getLeftMost(num/10)
+    }
   }
 
   def randomMove(lstOpenCoords: List[Coord2D], rand: Random): (Coord2D, Random) = {
-    val (index, newRand) = tirarRandao(lstOpenCoords.size, rand)
-    (lstOpenCoords(index), newRand)
+    val (valorGerado, newRand) = rand.nextInt
+    def index= getLeftMost(valorGerado)
+
+    if(index > lstOpenCoords.size || index < 0){
+      randomMove(lstOpenCoords, newRand)
+    }
+    else{
+      (lstOpenCoords(index), newRand)
+    }
+  }
+
 
 
     //devem faltar exceçoes: se a coordenada for uma parede ou ja tiver ocupada
