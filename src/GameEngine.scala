@@ -9,14 +9,7 @@ object GameEngine {
   //ze :D
   //gerar uma coordenada aleatória
   //válida para a próxima jogada a partir da lista de posições livres fornecidas
-
-  //vou assumir que temos 8 coordenadas possiveis para serem selecionadas:
-  //      0  0  0
-  //      0  1  0
-  //      0  0  0
-  // nao sei usar o randão ;_;
-
-  def randomMove(lstOpenCoords: List[Coord2D], rand: Random): (Coord2D, Random) = {
+  def randomMove(lstOpenCoords: List[Coord2D], rand: MyRandom): (Coord2D, MyRandom) = {
     val sizeList = lstOpenCoords.size
 
     val (valorGerado, newRand) = rand.nextInt(sizeList) //gera numeros negativos?
@@ -132,38 +125,32 @@ object GameEngine {
   }
 
   def main(args: Array[String]): Unit = {
-    val lstOpenCoords: List[Coord2D] = List(
-      (0, 0), (0, 1), (0, 2),
-      (1, 0), (1, 2),
-      (2, 0), (2, 1), (2, 2)
-    )
+    val board = List(
+      List(Stone.Black, Stone.White, Stone.Empty, Stone.Empty, Stone.Empty),
+      List(Stone.Empty, Stone.White, Stone.Black, Stone.Empty, Stone.Empty),
+      List(Stone.White, Stone.Empty, Stone.Black, Stone.Empty, Stone.Empty),
+      List(Stone.White, Stone.Empty, Stone.Black, Stone.Empty, Stone.Empty),
+      List(Stone.Empty, Stone.Empty, Stone.Empty, Stone.Empty, Stone.Empty))
+
+    println("Board inicial")
+    printBoard(board)
+    println("")
+
+    val lstOpenCoords: List[Coord2D] = List((0, 2), (0, 3), (0, 4), (1, 0), (1, 3), (1, 4), (2, 1), (2, 3),
+        (2,4), (3, 1), (3, 3), (3,4), (4, 0), (4, 1), (4,2), (4,3), (4,4))
 
     val rand = new MyRandom(1L)
-    val size = lstOpenCoords.size
+    val player1= Stone.Black
+    val player2= Stone.White
 
-    val (valor1, nextR) = rand.nextInt(size)
-    val (valor2, tR) = nextR.nextInt(size)
-    val (valor3, fR) = tR.nextInt(size)
-    val (valor4, fiveR) = fR.nextInt(size)
+    val (nextBoard, nextRand, nextLstOpenCoords) = playRandomly(board, rand, player1, lstOpenCoords, randomMove)
+    println("Player 1 moves!")
+    printBoard(nextBoard)
+    println("")
 
-    //println(valor1)
-    //println(valor2)
-    //println(valor3)
-    //println(valor4)
-
-    val (coord1, newRand) = randomMove(lstOpenCoords, rand)
-    val (coord2, nextRand) = randomMove(lstOpenCoords, rand) //igual ao 1
-    val (coord3, _) = randomMove(lstOpenCoords, nextRand) //differente dos dois
-
-    println(s"Primeira coordenada aleatória escolhida: $coord1")
-    println(s"Segunda coordenada aleatória escolhida: $coord2")
-    println(s"Terceira coordenada aleatória escolhida: $coord3")
-
-
-    val board = List(List(Stone.Black, Stone.White, Stone.Empty),
-      List(Stone.Empty, Stone.White, Stone.Black),
-      List(Stone.White, Stone.Empty, Stone.Black))
-
-    //printBoard(board)
+    val (newBoard, newRand, newLstOpenCoords) = playRandomly(nextBoard, nextRand, player2, nextLstOpenCoords, randomMove)
+    println("Player 2 moves!")
+    printBoard(newBoard)
+    println("")
   }
 }
