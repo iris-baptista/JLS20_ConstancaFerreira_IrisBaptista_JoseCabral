@@ -1,6 +1,11 @@
-object MyRandom {
-  def nextInt(): (Int, Random) = MyRandom.nextInt()
-}
+//object MyRandom {
+//  //def nextInt(): (Int, Random) = MyRandom.nextInt()
+//  def nextInt(): (Int, Random) = {
+//    val initialSeed = 123456789L
+//    val random = MyRandom(initialSeed)
+//    random.nextInt()
+//  }
+//}
 
 trait Random {
   def nextInt: (Int, Random)

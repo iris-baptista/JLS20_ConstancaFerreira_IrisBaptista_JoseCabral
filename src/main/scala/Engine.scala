@@ -1,5 +1,5 @@
 
-import Stone.Stone
+import Stone.{Black, Board, Coord2D, Empty, White}
 import MyRandom._
 import scala.annotation.tailrec
 
@@ -25,9 +25,9 @@ object Engine {
     }
   }
 
-  def randomMove(lstOpenCoords: List[Coord2D], rand: Random): (Coord2D, Random) = {
-    val (valorGerado, newRand) = rand.nextInt
-    def index= getLeftMost(valorGerado)
+  def randomMove(lstOpenCoords: List[Coord2D], rand: MyRandom): (Coord2D, MyRandom) = {
+    val (valorGerado, newRand) = rand.nextInt()
+    def index = getLeftMost(valorGerado)
 
     if(index > lstOpenCoords.size || index < 0){
       randomMove(lstOpenCoords, newRand)
@@ -45,7 +45,7 @@ object Engine {
 
     // 3-4-25 a constança disse q o codigo nao tava "puro", pus no chat e arranjeu :D
 
-  }
+
 
   //T2
   //devolve None se a cNova for invalida, devolve um board caso contrario
@@ -151,22 +151,8 @@ object Engine {
   }
 
   def main(args: Array[String]): Unit = {
-    //    val lstOpenCoords: List[Coord2D] = List(
-    //      (0, 0), (0, 1), (0, 2),
-    //      (1, 0), (1, 2),
-    //      (2, 0), (2, 1), (2, 2)
-    //    ) //xd
-    //
-    //    val rand = new MyRandom()
-    //
-    //    val (coord, _) = randomMove(lstOpenCoords, rand)
-    //
-    //    println(s"Coordenada aleatória escolhida: $coord")
-    //println("ze")
-
-
     val board = Board.empty
-    val rand = new MyRandom()
+    val rand = MyRandom(123456789L)  // Criar uma instância de MyRandom com uma seed específica
 
     val lstOpenCoords: List[Coord2D] = List(
       (0, 0), (0, 1), (0, 2),
@@ -174,10 +160,18 @@ object Engine {
       (2, 0), (2, 1), (2, 2)
     )
 
-    val (coord, _) = randomMove(lstOpenCoords, rand)
+    // Teste da geração de coordenada aleatória
+    val (coord, newRand) = randomMove(lstOpenCoords, rand)
     println(s"Coordenada aleatória escolhida: $coord")
 
-    val (newBoard, _, newLstOpenCoords) = playRandomly(board, rand, Black, lstOpenCoords, randomMove)
+    // Realiza uma jogada com o novo gerador de números aleatórios
+    val (newBoard, _, newLstOpenCoords) = playRandomly(board, newRand, Black, lstOpenCoords, randomMove)
+
+    // Exibe o estado do tabuleiro após a jogada
+    println("Estado do tabuleiro após a jogada:")
     printBoard(newBoard)
+
+    // Exibe a lista de coordenadas restantes
+    println(s"Lista de coordenadas restantes: $newLstOpenCoords")
   }
 }
