@@ -17,24 +17,16 @@ object GameEngine {
   //      0  0  0
   // nao sei usar o randão ;_;
 
-  def getLeftmost(num: Int): Int = {
-    if(num < 10){
-      return num
-    }
-    else{
-      getLeftmost(num/10)
-    }
-  }
-
   def randomMove(lstOpenCoords: List[Coord2D], rand: Random): (Coord2D, Random) = {
-    val (valorGerado, newRand) = rand.nextInt
-    def index= getLeftmost(valorGerado)
+    val sizeList= lstOpenCoords.size
 
-    if(index > lstOpenCoords.size || index < 0){
+    val (valorGerado, newRand) = rand.nextInt(sizeList) //gera numeros negativos?
+
+    if(valorGerado > lstOpenCoords.size){
       randomMove(lstOpenCoords, newRand)
     }
     else{
-      (lstOpenCoords(index), newRand)
+      (lstOpenCoords(valorGerado), newRand)
     }
   }
 
@@ -148,14 +140,26 @@ object GameEngine {
     )
 
     val rand = new MyRandom(1L)
+    val size= lstOpenCoords.size
+
+    val (valor1, nextR) = rand.nextInt(size)
+    val (valor2, tR) = nextR.nextInt(size)
+    val (valor3, fR) = tR.nextInt(size)
+    val (valor4, fiveR) = fR.nextInt(size)
+
+    //println(valor1)
+    //println(valor2)
+    //println(valor3)
+    //println(valor4)
 
     val (coord1, newRand) = randomMove(lstOpenCoords, rand)
-    val (coord2, nextRand) = randomMove(lstOpenCoords, rand)
-    val (coord3, _) = randomMove(lstOpenCoords, nextRand)
+    val (coord2, nextRand) = randomMove(lstOpenCoords, rand) //igual ao 1
+    val (coord3, _) = randomMove(lstOpenCoords, nextRand) //differente dos dois
 
     println(s"Primeira coordenada aleatória escolhida: $coord1")
     println(s"Segunda coordenada aleatória escolhida: $coord2")
     println(s"Terceira coordenada aleatória escolhida: $coord3")
+
 
     val board = List(List(Stone.Black, Stone.White, Stone.Empty),
       List(Stone.Empty, Stone.White, Stone.Black),
