@@ -1,5 +1,5 @@
-import Stone.Stone
 import scala.annotation.tailrec
+import Stone.Stone
 
 object GameEngine {
   type Board = List[List[Stone]]
@@ -160,10 +160,7 @@ object GameEngine {
     println(s"Terceira coordenada aleatória escolhida: $coord3")
 
 
-    val board = List(List(Stone.Black, Stone.White, Stone.Empty),
-      List(Stone.Empty, Stone.White, Stone.Black),
-      List(Stone.White, Stone.Empty, Stone.Black))
-
-    //printBoard(board)
+    val board = List(List(Stone.Black, Stone.White, Stone.Empty), List(Stone.Empty, Stone.White, Stone.Black), List(Stone.White, Stone.Empty, Stone.Black))
+    printBoard(board)
   }
 }
