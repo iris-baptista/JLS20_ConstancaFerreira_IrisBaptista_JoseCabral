@@ -1,6 +1,5 @@
 import Stone.Stone
 import scala.annotation.tailrec
-import scala.util.Random
 
 object GameEngine {
   type Board = List[List[Stone]]
@@ -17,20 +16,17 @@ object GameEngine {
   //      0  0  0
   // nao sei usar o randão ;_;
 
-  class MyRandom {
-    def tirarRandao(max: Int): (Int, MyRandom) = {
-      val randNum = Random.nextInt(max) // Gera um randu de 0 a (max - 1), q sera o size()
-      (randNum, this)
+  def randomMove(lstOpenCoords: List[Coord2D], rand: Random): (Coord2D, Random) = {
+    val sizeList = lstOpenCoords.size
+
+    val (valorGerado, newRand) = rand.nextInt(sizeList) //gera numeros negativos?
+
+    if (valorGerado > lstOpenCoords.size) {
+      randomMove(lstOpenCoords, newRand)
     }
-  }
-
-  def randomMove(lstOpenCoords: List[Coord2D], rand: MyRandom): (Coord2D, MyRandom) = {
-    val (index, newRand) = rand.tirarRandao(lstOpenCoords.size)
-    (lstOpenCoords(index), newRand)
-
-    //devem faltar exceçoes: se a coordenada for uma parece ou ja tiver ocupada
-    // este codigo assume que a lista fornecida ja tem as coordenadas certas
-    //isto nao está como poo, onde tu darias a coordenada propria da cena e ele gerava a lista das coordenadas possiveis
+    else {
+      (lstOpenCoords(valorGerado), newRand)
+    }
   }
 
   //T2
@@ -136,23 +132,38 @@ object GameEngine {
   }
 
   def main(args: Array[String]): Unit = {
-    //    val lstOpenCoords: List[Coord2D] = List(
-    //      (0, 0), (0, 1), (0, 2),
-    //      (1, 0), (1, 2),
-    //      (2, 0), (2, 1), (2, 2)
-    //    ) //xd
-    //
-    //    val rand = new MyRandom()
-    //
-    //    val (coord, _) = randomMove(lstOpenCoords, rand)
-    //
-    //    println(s"Coordenada aleatória escolhida: $coord")
-    //println("ze")
+    val lstOpenCoords: List[Coord2D] = List(
+      (0, 0), (0, 1), (0, 2),
+      (1, 0), (1, 2),
+      (2, 0), (2, 1), (2, 2)
+    )
+
+    val rand = new MyRandom(1L)
+    val size = lstOpenCoords.size
+
+    val (valor1, nextR) = rand.nextInt(size)
+    val (valor2, tR) = nextR.nextInt(size)
+    val (valor3, fR) = tR.nextInt(size)
+    val (valor4, fiveR) = fR.nextInt(size)
+
+    //println(valor1)
+    //println(valor2)
+    //println(valor3)
+    //println(valor4)
+
+    val (coord1, newRand) = randomMove(lstOpenCoords, rand)
+    val (coord2, nextRand) = randomMove(lstOpenCoords, rand) //igual ao 1
+    val (coord3, _) = randomMove(lstOpenCoords, nextRand) //differente dos dois
+
+    println(s"Primeira coordenada aleatória escolhida: $coord1")
+    println(s"Segunda coordenada aleatória escolhida: $coord2")
+    println(s"Terceira coordenada aleatória escolhida: $coord3")
+
 
     val board = List(List(Stone.Black, Stone.White, Stone.Empty),
       List(Stone.Empty, Stone.White, Stone.Black),
       List(Stone.White, Stone.Empty, Stone.Black))
 
-    printBoard(board)
+    //printBoard(board)
   }
 }
