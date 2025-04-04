@@ -1,10 +1,10 @@
-
-import Stone.{Black, Board, Coord2D, Empty, White}
-import MyRandom._
+import Stone.Stone
 import scala.annotation.tailrec
 
+object GameEngine {
+  type Board = List[List[Stone]]
+  type Coord2D = (Int, Int)
 
-object Engine {
   //T1
   //ze :D
   //gerar uma coordenada aleatória
@@ -16,36 +16,18 @@ object Engine {
   //      0  0  0
   // nao sei usar o randão ;_;
 
-  def getLeftMost(num: Int): Int = {
-    if(num < 10){
-      return num
-    }
-    else{
-      getLeftMost(num/10)
-    }
-  }
+  def randomMove(lstOpenCoords: List[Coord2D], rand: Random): (Coord2D, Random) = {
+    val sizeList = lstOpenCoords.size
 
-  def randomMove(lstOpenCoords: List[Coord2D], rand: MyRandom): (Coord2D, MyRandom) = {
-    val (valorGerado, newRand) = rand.nextInt()
-    def index = getLeftMost(valorGerado)
+    val (valorGerado, newRand) = rand.nextInt(sizeList) //gera numeros negativos?
 
-    if(index > lstOpenCoords.size || index < 0){
+    if (valorGerado > lstOpenCoords.size) {
       randomMove(lstOpenCoords, newRand)
     }
-    else{
-      (lstOpenCoords(index), newRand)
+    else {
+      (lstOpenCoords(valorGerado), newRand)
     }
   }
-
-
-
-    //devem faltar exceçoes: se a coordenada for uma parede ou ja tiver ocupada
-    // este codigo assume que a lista fornecida ja tem as coordenadas certas
-    //isto nao está como poo, onde tu darias a coordenada propria da cena e ele gerava a lista das coordenadas possiveis
-
-    // 3-4-25 a constança disse q o codigo nao tava "puro", pus no chat e arranjeu :D
-
-
 
   //T2
   //devolve None se a cNova for invalida, devolve um board caso contrario
@@ -140,38 +122,48 @@ object Engine {
 
   //T4
   def printBoard(board: Board): Unit = {
-    board.foreach {
-      row =>
+    board.foreach { row =>
       println(row.map {
-        case Black => "B"
-        case White => "W"
-        case Empty => "-"
+        case Stone.Black => "B"
+        case Stone.White => "W"
+        case Stone.Empty => "-"
       }.mkString(" "))
     }
   }
 
   def main(args: Array[String]): Unit = {
-    val board = Board.empty
-    val rand = MyRandom(123456789L)  // Criar uma instância de MyRandom com uma seed específica
-
     val lstOpenCoords: List[Coord2D] = List(
       (0, 0), (0, 1), (0, 2),
       (1, 0), (1, 2),
       (2, 0), (2, 1), (2, 2)
     )
 
-    // Teste da geração de coordenada aleatória
-    val (coord, newRand) = randomMove(lstOpenCoords, rand)
-    println(s"Coordenada aleatória escolhida: $coord")
+    val rand = new MyRandom(1L)
+    val size = lstOpenCoords.size
 
-    // Realiza uma jogada com o novo gerador de números aleatórios
-    val (newBoard, _, newLstOpenCoords) = playRandomly(board, newRand, Black, lstOpenCoords, randomMove)
+    val (valor1, nextR) = rand.nextInt(size)
+    val (valor2, tR) = nextR.nextInt(size)
+    val (valor3, fR) = tR.nextInt(size)
+    val (valor4, fiveR) = fR.nextInt(size)
 
-    // Exibe o estado do tabuleiro após a jogada
-    println("Estado do tabuleiro após a jogada:")
-    printBoard(newBoard)
+    //println(valor1)
+    //println(valor2)
+    //println(valor3)
+    //println(valor4)
 
-    // Exibe a lista de coordenadas restantes
-    println(s"Lista de coordenadas restantes: $newLstOpenCoords")
+    val (coord1, newRand) = randomMove(lstOpenCoords, rand)
+    val (coord2, nextRand) = randomMove(lstOpenCoords, rand) //igual ao 1
+    val (coord3, _) = randomMove(lstOpenCoords, nextRand) //differente dos dois
+
+    println(s"Primeira coordenada aleatória escolhida: $coord1")
+    println(s"Segunda coordenada aleatória escolhida: $coord2")
+    println(s"Terceira coordenada aleatória escolhida: $coord3")
+
+
+    val board = List(List(Stone.Black, Stone.White, Stone.Empty),
+      List(Stone.Empty, Stone.White, Stone.Black),
+      List(Stone.White, Stone.Empty, Stone.Black))
+
+    //printBoard(board)
   }
 }
