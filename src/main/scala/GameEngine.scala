@@ -6,15 +6,14 @@ object GameEngine {
   type Coord2D = (Int, Int)
 
   //T1
-  //ze :D
   //gerar uma coordenada aleatória
   //válida para a próxima jogada a partir da lista de posições livres fornecidas
   def randomMove(lstOpenCoords: List[Coord2D], rand: MyRandom): (Coord2D, MyRandom) = {
     val sizeList = lstOpenCoords.size
 
-    val (valorGerado, newRand) = rand.nextInt(sizeList) //gera numeros negativos?
+    val (valorGerado, newRand) = rand.nextInt(sizeList)
 
-    if (valorGerado > lstOpenCoords.size) {
+    if (valorGerado > lstOpenCoords.size || valorGerado < 0) {
       randomMove(lstOpenCoords, newRand)
     }
     else {
@@ -132,7 +131,7 @@ object GameEngine {
       List(Stone.White, Stone.Empty, Stone.Black, Stone.Empty, Stone.Empty),
       List(Stone.Empty, Stone.Empty, Stone.Empty, Stone.Empty, Stone.Empty))
 
-    println("Board inicial")
+    println("Board Inicial:")
     printBoard(board)
     println("")
 
@@ -144,12 +143,12 @@ object GameEngine {
     val player2= Stone.White
 
     val (nextBoard, nextRand, nextLstOpenCoords) = playRandomly(board, rand, player1, lstOpenCoords, randomMove)
-    println("Player 1 moves!")
+    println("Player 1 Moves!")
     printBoard(nextBoard)
     println("")
 
     val (newBoard, newRand, newLstOpenCoords) = playRandomly(nextBoard, nextRand, player2, nextLstOpenCoords, randomMove)
-    println("Player 2 moves!")
+    println("Player 2 Moves!")
     printBoard(newBoard)
     println("")
   }
