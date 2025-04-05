@@ -8,6 +8,7 @@ object GameEngine {
   //T1
   //gerar uma coordenada aleatória
   //válida para a próxima jogada a partir da lista de posições livres fornecidas
+  @tailrec
   def randomMove(lstOpenCoords: List[Coord2D], rand: MyRandom): (Coord2D, MyRandom) = {
     val sizeList = lstOpenCoords.size
 
@@ -150,6 +151,5 @@ object GameEngine {
     val (newBoard, newRand, newLstOpenCoords) = playRandomly(nextBoard, nextRand, player2, nextLstOpenCoords, randomMove)
     println("Player 2 Moves!")
     printBoard(newBoard)
-    println("")
   }
 }
