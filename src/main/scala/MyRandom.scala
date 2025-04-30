@@ -13,7 +13,12 @@ case class MyRandom(seed: Long) { //seed equivalente a x na equacao y=f(x)
     val valorGerado = (newSeed >>> shifts).toInt //>>> faz shift right para limitar o valor
 
     val newRandom = MyRandom(newSeed)
-    (valorGerado, newRandom)
+    if(valorGerado > sizeList || valorGerado < 0){ //se gerou um dos valores out of bounds
+      newRandom.nextInt(sizeList)
+    }
+    else {
+      (valorGerado, newRandom)
+    }
   }
 
   def getBits(max: Int, bitsPossible: Int): Int = {

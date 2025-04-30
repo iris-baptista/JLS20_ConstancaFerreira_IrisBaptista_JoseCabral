@@ -8,18 +8,11 @@ object GameEngine {
   //T1
   //gerar uma coordenada aleatória
   //válida para a próxima jogada a partir da lista de posições livres fornecidas
-  @tailrec
   def randomMove(lstOpenCoords: List[Coord2D], rand: MyRandom): (Coord2D, MyRandom) = {
     val sizeList = lstOpenCoords.size
-
     val (valorGerado, newRand) = rand.nextInt(sizeList)
 
-    if (valorGerado > lstOpenCoords.size || valorGerado < 0) {
-      randomMove(lstOpenCoords, newRand)
-    }
-    else {
-      (lstOpenCoords(valorGerado), newRand)
-    }
+    (lstOpenCoords(valorGerado), newRand)
   }
 
   //T2
