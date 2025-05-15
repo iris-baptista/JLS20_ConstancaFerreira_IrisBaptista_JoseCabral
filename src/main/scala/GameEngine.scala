@@ -120,27 +120,32 @@ object GameEngine {
   //T5
   //devolve um novo tabuleiro sem peça(s) capturadas (i.e. substiuíndo-as por Stone.Empty) e o número de peças capturadas
   //isto e a fn de quando capturamos umas pecas, elas desaparecem do tabuleiro
-  def getGroupStones(board: Board, player: Stone) : (Board, Int) = {
-    //temos de contar as pecas recursivamente, alterando o tabuleiro as u go
-    //nao me lembro como e q sabemos se esta capturada
-    return (board, 0) //temp value para nao dar erro
+  //player e a peca jogada, coordenada e onde foi jogada
+  //deve atualizar o gameState???????????
+  def getGroupStones(board: Board, player: Stone, coord2D: Coord2D) : (Board, Int) = {
+    //verificar se capturou
+    //contar pecas q capturou
+
+    (board, 0) //return nao e necessario
   }
 
   //T6
   //verifica se o computador ou o jogador ganhou o jogo (ou seja, se já foram capturadas o número de peças necessárias)
-  //devia passar o jogador ou so usar Stone.White/Stone.Black em vez de passar parametros
-  def alguemGanhou(board: Board, whitePlayer: Stone, blackPlayer: Stone): Option[Stone] = {
-    val (_, whites)= getGroupStones(board, whitePlayer)
-    if(whites == 10){ //assumir q o valor needed e 10, fazer double check
-      return Some(whitePlayer) //vou assumir q devolvemos a stone para o jogador q ganho
+  def seGanhou(gameState: GameState): Option[Stone] = {
+    val toWin= gameState.toWin
+    val captureW= gameState.captureWhite
+    val captureB= gameState.captureBlack
+
+    if(captureW == toWin){ //se branco ganhou
+      return Some(Stone.White) //vou assumir q devolvemos a stone para o jogador q ganho
     }
 
-    val (_, blacks)= getGroupStones(board, blackPlayer)
-    if(blacks == 10){
-      return Some(blackPlayer)
+    if(captureB == toWin){ //se o preto ganhou
+      return Some(Stone.Black)
     }
 
-    return None //nao sei por q este return nao esta mudar de cor???
+    //se nao encontrou
+    None //nao precisa da palavra return
   }
 
   def main(args: Array[String]): Unit = {
