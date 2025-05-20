@@ -3,7 +3,7 @@ import scala.annotation.tailrec
 
 object GameEngine {
   type Board = List[List[Stone]]
-  type Coord2D = (Int, Int)
+  type Coord2D = (Int, Int) //row, column
 
   //T1
   //gerar uma coordenada aleatória
@@ -122,11 +122,174 @@ object GameEngine {
   //isto e a fn de quando capturamos umas pecas, elas desaparecem do tabuleiro
   //player e a peca jogada, coordenada e onde foi jogada
   //deve atualizar o gameState???????????
-  def getGroupStones(board: Board, player: Stone, coord2D: Coord2D) : (Board, Int) = {
-    //verificar se capturou
-    //contar pecas q capturou
+  def getGroupStones(board: Board, player: Stone, playerCoord: Coord2D) : (Board, Int) = {
+    def getSurroundingStones(coord: Coord2D): List[Coord2D] = {
+      @tailrec
+      def getValidCoord(currentPossible: List[Coord2D], valid: List[Coord2D]) : List[Coord2D] = {
+        currentPossible match {
+          case Nil => return valid
+          case x :: xs => {
+            val linha = x._1
+            val coluna = x._2
 
-    (board, 0) //return nao e necessario
+            if(linha > -1 && linha < board.size && coluna > -1 && coluna < board.head.size){
+              getValidCoord(xs, x::valid)
+            }
+            else{
+              getValidCoord(xs, valid)
+            }
+          }
+        }
+      }
+
+      val linha = coord._1
+      val coluna = coord._2
+
+      val possible= List((linha-1, coluna), (linha, coluna-1), (linha, coluna+1), (linha+1, coluna))
+      getValidCoord(possible, List())
+    }
+
+    @tailrec
+    def findOpponent(surroundingCoord: List[Coord2D], currentCoord: List[Coord2D]): List[Coord2D] = { //pode ter mais q uma peca a volta
+      surroundingCoord match{
+        case Nil => return currentCoord
+        case x :: xs => {
+          val linha = x._1
+          val coluna = x._2
+
+          val stone= board(linha)(coluna)
+          if(stone != Stone.Empty && stone != player){ //se for o apponent
+            findOpponent(xs, x::currentCoord)
+          }
+          else{
+            findOpponent(xs, currentCoord)
+          }
+        }
+      }
+
+      /*remainingBoard match {
+        case Nil => Nil
+        case x :: y :: z :: xs => {
+          if(currentLine == linha-1){ //se x e a linha acima da peca
+            val top= checkLinha(x, coluna)
+            val left= checkLinha(y, coluna-1)
+            val right= checkLinha(y, coluna+1)
+            val bottom= checkLinha(z, coluna)
+          }
+          else{
+            findOpponent(y::z::xs, currentLine+1)
+          }
+        }
+      }
+
+      def checkLinha(linha: List[Stone], index: Int): Boolean = {
+
+      }*/
+    }
+
+    def getLiberties(surroundingCoord: List[Coord2D], currentLiberties: List[Coord2D]) : List[Coord2D] = {
+      surroundingCoord match{
+        case Nil => currentLiberties
+        case x :: xs => {
+          val linha = x._1
+          val coluna = x._2
+
+          val stone= board(linha)(coluna)
+          if(stone != Stone.White){ //se nao for o apponent
+            getLiberties(xs, x::currentLiberties)
+          }
+          else{
+            getLiberties(xs, currentLiberties)
+          }
+        }
+      }
+    }
+
+    //primeira lista devolvida contem as liberties do grupo, segunda contem as pedras do grupo
+    def findGroup(currentStones: List[Coord2D], liberties: List[Coord2D], stones: List[Coord2D]): (List[Coord2D], List[Coord2D]) = {
+      currentStones match {
+        case Nil => (liberties, stones)
+        case x::xs => {
+          val surrounding= getSurroundingStones(x)
+          val libertiesFound= getLiberties(surrounding, List())
+
+          findGroup(xs, libertiesFound::liberties, x::stones) //FALTA ADICIONAR OS OUTROS MEMBROS DO GRUPO AO XS
+        }
+      }
+    }
+
+    @tailrec
+    def checkLiberties(coordenadasLeft: List[Coord2D]): Boolean = {
+      coordenadasLeft match {
+        case Nil => true //se todas tinham pecas do jogador
+        case x::xs =>
+          val linha= x._1
+          val coluna= x._2
+
+          val liberty= board(linha)(coluna)
+          if(liberty != player){ //se nao tem uma peca do jogador
+            false
+          }
+          else{
+            checkLiberties(xs)
+          }
+      }
+    }
+
+    @tailrec
+    def atualizarBoard(currentBoard: Board, coordenadas: List[Coord2D]): Board = {
+      coordenadas match{
+        case Nil => currentBoard
+        case x::xs => {
+          val linha= x._1
+          val coluna= x._2
+
+          def removeStone(remainingBoard: Board, currentLine: Int): Board = {
+            remainingBoard match { //vai a procura da linha
+              case Nil => Nil
+              case y :: ys =>
+                if (currentLine == linha) {
+                  val newLine = alterLine(y, 0)
+                  newLine :: ys
+                }
+                else {
+                  y :: removeStone(ys, currentLine+1)
+                }
+            }
+          }
+
+          def alterLine(line: List[Stone], currentCol: Int): List[Stone] = {
+            line match {
+              case Nil => Nil
+              case y :: ys =>
+                if (currentCol == coluna) {
+                  Stone.Empty :: ys
+                }
+                else {
+                  y :: alterLine(ys, currentCol+1)
+                }
+            }
+          }
+
+          atualizarBoard(removeStone(currentBoard, 0), xs)
+        }
+      }
+    }
+
+    val surrounding= getSurroundingStones(playerCoord)
+    val opponent= findOpponent(surrounding, List())
+    val (liberties, stones)= findGroup(opponent, List(), List())
+    val captured= checkLiberties(liberties)
+
+    if(captured){
+      val novoBoard= atualizarBoard(board, stones)
+      val total= stones.size
+
+      (novoBoard, total)
+    }
+    else{ //se nao capturou as pecas, devolve como estava
+      (board, 0)
+    }
   }
 
   //T6
