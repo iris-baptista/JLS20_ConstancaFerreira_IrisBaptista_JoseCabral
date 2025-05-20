@@ -108,12 +108,42 @@ object GameEngine {
 
   //T4
   def printBoard(board: Board): Unit = {
-    board.foreach { row =>
-      println(row.map {
-        case Stone.Black => "B"
-        case Stone.White => "W"
-        case Stone.Empty => "-"
-      }.mkString(" "))
+    board match {
+      case x::Nil =>{
+        printLine(x)
+        println("")
+      }
+      case x::xs => {
+        printLine(x)
+        println("")
+        printBoard(xs)
+      }
+    }
+  }
+
+  def printLine(list: List[Stone]): Any = {
+    list match {
+      case x::Nil =>{
+        if(x.toString == "Black") {
+          print(" B ")
+        } else if(x.toString == "White") {
+          print(" W ")
+        } else if(x.toString == "Empty") {
+          print(" - ")
+        }
+      }
+      case x::xs =>{
+        if(x.toString == "Black") {
+          print(" B ")
+          printLine(xs)
+        } else if(x.toString == "White") {
+          print(" W ")
+          printLine(xs)
+        } else if(x.toString == "Empty") {
+          print(" - ")
+          printLine(xs)
+        }
+      }
     }
   }
 
