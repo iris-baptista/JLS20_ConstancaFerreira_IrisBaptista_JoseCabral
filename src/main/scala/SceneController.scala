@@ -1,0 +1,5 @@
+class SceneController {
+  def switchToGame() = {
+
+  }
+}
