@@ -2,8 +2,13 @@ import Stone.Stone
 import scala.annotation.tailrec
 
 object GameEngine {
+
+
   type Board = List[List[Stone]]
   type Coord2D = (Int, Int)
+
+  type GameState = (Board, List[Coord2D])
+  var jogadas: List[GameState] = List()
 
   //T1
   //ze :D
@@ -93,6 +98,7 @@ object GameEngine {
 
       val novoBoard = searchBoard(oldBoard, 0) //assumir q comecamos a contar em 0
       novoBoard //devolve board com stone nova
+
     }
 
     if (inList(cLivres)) { //se tiver
@@ -104,10 +110,12 @@ object GameEngine {
     else { //se nao tiver, devolver none e a lista como esta
       (None, cLivres)
     }
+
   }
 
   //T3
   def playRandomly(board: Board, r: MyRandom, player: Stone, lstOpenCoords: List[Coord2D], f: (List[Coord2D], MyRandom) => (Coord2D, MyRandom)):
+
   (Board, MyRandom, List[Coord2D]) = {
     val (coord, newR) = f(lstOpenCoords, r) // validate
     val (optBoard, newLstOpenCoords) = play(board, player, coord, lstOpenCoords)
@@ -118,6 +126,8 @@ object GameEngine {
       val newBoard = optBoard.get
       (newBoard, newR, newLstOpenCoords)
     }
+
+    //novaJogada(board, lstOpenCoords)
   }
 
   //T4
@@ -131,39 +141,106 @@ object GameEngine {
     }
   }
 
+
+
+  //T5
+
+  //T6
+
+  //os acima sao da concha :D
+
+  //T7
+
+  def timer(): Unit = {
+    val inicio = System.currentTimeMillis()
+    val joever = 15 * 1000 // 15 segundos em milissegundos pq ya
+
+    @tailrec //confio q ponho aqui
+    def espera(): Unit = {
+      val agora = System.currentTimeMillis()
+      if (agora - inicio < joever) {
+        espera() // chamada recursiva da cena
+      }
+    }
+    println("timer iniciado confia")
+    espera()
+    println("its joever")
+
+  }
+
+
+
+
+  //System.currentTimeMillis()
+
+  //def timerUp()
+  //ainda nao sei o q por aqui
+
+
+
+
+
+  def novaJogada(board: Board, livres: List[Coord2D]): Unit = {
+    //por esta cena antes de cada jogada:   novaJogada(board, lstOpenCoords)
+    jogadas = (board, livres) :: jogadas
+  }
+
+  //achei q podia usar folding, o chat discordou ;_;
+  def undo(): Option[GameState] = { //mas dava para deixar tail recursive
+    jogadas match {
+      case Nil =>
+        println("nao da zezoca")
+        None
+      case anterior :: restantes =>
+        jogadas = restantes
+        Some(anterior)
+    }
+  }
+
+
+  //T8
+
   def main(args: Array[String]): Unit = {
-    val lstOpenCoords: List[Coord2D] = List(
-      (0, 0), (0, 1), (0, 2),
-      (1, 0), (1, 2),
-      (2, 0), (2, 1), (2, 2)
-    )
+        val lstOpenCoords: List[Coord2D] = List(
+          (0, 0), (0, 1), (0, 2),
+          (1, 0), (1, 2),
+          (2, 0), (2, 1), (2, 2)
+        )
 
-    val rand = new MyRandom(1L)
-    val size = lstOpenCoords.size
+        val rand = new MyRandom(1L)
+        val size = lstOpenCoords.size
 
-    val (valor1, nextR) = rand.nextInt(size)
-    val (valor2, tR) = nextR.nextInt(size)
-    val (valor3, fR) = tR.nextInt(size)
-    val (valor4, fiveR) = fR.nextInt(size)
+        val (valor1, nextR) = rand.nextInt(size)
+        val (valor2, tR) = nextR.nextInt(size)
+        val (valor3, fR) = tR.nextInt(size)
+        val (valor4, fiveR) = fR.nextInt(size)
 
-    //println(valor1)
-    //println(valor2)
-    //println(valor3)
-    //println(valor4)
+        //println(valor1)
+        //println(valor2)
+        //println(valor3)
+        //println(valor4)
 
-    val (coord1, newRand) = randomMove(lstOpenCoords, rand)
-    val (coord2, nextRand) = randomMove(lstOpenCoords, rand) //igual ao 1
-    val (coord3, _) = randomMove(lstOpenCoords, nextRand) //differente dos dois
+        val (coord1, newRand) = randomMove(lstOpenCoords, rand)
+        val (coord2, nextRand) = randomMove(lstOpenCoords, rand) //igual ao 1
+        val (coord3, _) = randomMove(lstOpenCoords, nextRand) //differente dos dois
 
-    println(s"Primeira coordenada aleatória escolhida: $coord1")
-    println(s"Segunda coordenada aleatória escolhida: $coord2")
-    println(s"Terceira coordenada aleatória escolhida: $coord3")
+        println(s"Primeira coordenada aleatória escolhida: $coord1")
+        println(s"Segunda coordenada aleatória escolhida: $coord2")
+        println(s"Terceira coordenada aleatória escolhida: $coord3")
 
 
-    val board = List(List(Stone.Black, Stone.White, Stone.Empty),
-      List(Stone.Empty, Stone.White, Stone.Black),
-      List(Stone.White, Stone.Empty, Stone.Black))
+        val board = List(List(Stone.Black, Stone.White, Stone.Empty),
+          List(Stone.Empty, Stone.White, Stone.Black),
+          List(Stone.White, Stone.Empty, Stone.Black))
 
-    //printBoard(board)
+    printBoard(board)
+
+    println("timer ligado")
+    timer()
+    println("wake up joe")
+
+    //novaJogada(board, lstOpenCoords)
+
   }
 }
+

@@ -10,6 +10,8 @@ trait Random {
 
 case class MyRandom(seed: Long) extends Random { //seed equivalente a x na equacao y=f(x)
   def nextInt(sizeList: Int): (Int, Random) = {
+
+    //deviamos por aquela cena da seed baseada no tempo
     val newSeed = ((seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFFL) //L para long
 
     val bitsWanted= getBits(sizeList, 9) //9 e o maior possivel para qualquer board de go (da 512 valores, board maior tem 361)
