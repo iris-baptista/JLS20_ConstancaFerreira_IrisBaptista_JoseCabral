@@ -118,16 +118,16 @@ object GameEngine {
   }
 
   //T5
-  //devolve um novo tabuleiro sem peça(s) capturadas (i.e. substiuíndo-as por Stone.Empty) e o número de peças capturadas
-  //isto e a fn de quando capturamos umas pecas, elas desaparecem do tabuleiro
+  //captura pecas (se da)
+  //devolve um novo tabuleiro sem a(s) peça(s) capturadas (o espaco fica vazio) e o número de peças capturadas
   //player e a peca jogada, coordenada e onde foi jogada
-  //deve atualizar o gameState???????????
+  //podemos passar o gameState?
   def getGroupStones(board: Board, player: Stone, playerCoord: Coord2D) : (Board, Int) = {
-    //fns
-    //devolve pecas a volta da coord passada
+    //fns para recursao
+    //devolve pecas q estao a volta da coord passada
     def getSurroundingStones(coord: Coord2D): List[Coord2D] = {
-      @tailrec
-      def getValidCoord(currentPossible: List[Coord2D], valid: List[Coord2D]) : List[Coord2D] = { //verifica q as posicoes estao validas
+      @tailrec //verifica q as posicoes estao validas
+      def getValidCoord(currentPossible: List[Coord2D], valid: List[Coord2D]) : List[Coord2D] = {
         currentPossible match {
           case Nil => return valid
           case x :: xs => {
@@ -151,8 +151,7 @@ object GameEngine {
       getValidCoord(possible, List())
     }
 
-    //encontra todas as pecas do outro jogador a volta da peca jogada (pode ter mais q uma)
-    @tailrec
+    @tailrec //encontra todas as pecas do outro jogador a volta da peca jogada (pode ter mais q uma)
     def findOpponent(surroundingCoord: List[Coord2D], currentCoord: List[Coord2D]): List[Coord2D] = {
       surroundingCoord match{
         case Nil => currentCoord
@@ -172,18 +171,20 @@ object GameEngine {
     }
 
     //encontra um grupo de pecas do opponent, e as liberdades do grupo
-    def findGroup(currentStones: List[Coord2D], liberties: List[Coord2D], stones: List[Coord2D]): (List[Coord2D], List[Coord2D]) = { //primeira lista devolvida contem as liberties do grupo, segunda contem todas as pedras do grupo
-      currentStones match { //assumir q current stones so tem stones do opponent
-        case Nil => (liberties, stones)
+    //primeira lista devolvida contem as liberties do grupo, segunda contem todas as pedras do grupo
+    def findGroup(currentStones: List[Coord2D], liberties: List[Coord2D], stones: List[Coord2D]): (List[Coord2D], List[Coord2D]) = {
+      currentStones match { //current stones so tem stones do opponent
+        case Nil => (liberties, stones) //se ja nao ha mais para visitar
         case x::xs => {
-          if(stones.contains(x)){ //se estamos a repetir uma pedra na recursao
-            findGroup(xs, liberties, stones)
+          if(stones.contains(x)){ //se estamos a repetir uma pedra na recursao q ja verificamos
+            findGroup(xs, liberties, stones) //passar atual e continuar recursao
           }
           else{
-            val surrounding= getSurroundingStones(x)
-            val otherMembers= findOpponent(surrounding, List())
-            val libertiesFound= getLiberties(surrounding, List())
+            val surrounding= getSurroundingStones(x) //encontrar pecas a volta da atual (opponent)
+            val otherMembers= findOpponent(surrounding, List()) //encontrar todas as posicoes q nao tem uma peca igual a atual
+            val libertiesFound= getLiberties(surrounding, List()) //nas pecas iguais marcar as liberdades
 
+            //repetir chamada juntado pecas q podem ser parte do grupo ao currentStones, e atualizando as liberties/stones
             findGroup(joinLists(xs,otherMembers), joinLists(libertiesFound, liberties), x::stones)
           }
         }
@@ -199,8 +200,9 @@ object GameEngine {
           val coluna = x._2
 
           val stone= board(linha)(coluna)
-          if(stone != Stone.White){ //se nao for o apponent
+          if(stone == player || stone == Stone.Empty){ //se nao for o apponent
             getLiberties(xs, x::currentLiberties) //adicinar a lista de liberties e continua a percurrer as coordenadas dadas
+            //assim adiciouna espacos vazios e espacos com o proprio jogador
           }
           else{ //caso contrario continuar a percurrer
             getLiberties(xs, currentLiberties)
@@ -209,13 +211,13 @@ object GameEngine {
       }
     }
 
-    //junta as listas dadas para nao ter valores repetidos
+    //junta as listas dadas de forma a nao ter valores repetidos
     def joinLists(newL: List[Coord2D], currentL: List[Coord2D]): List[Coord2D] = {
       newL match{
         case Nil => currentL
         case x::xs => {
           if(currentL.contains(x)){ //se ja tem o valor
-            joinLists(xs, currentL)
+            joinLists(xs, currentL) //passa valor e continuar a percurrer
           }
           else{ //se nao tem o valor concatena a coordenada
             joinLists(xs, x::currentL)
@@ -224,8 +226,7 @@ object GameEngine {
       }
     }
 
-    //verifica se as liberties foram todas preenchidas pelo jogador (se capturou o grupo)
-    @tailrec
+    @tailrec //verifica se as liberties foram todas preenchidas pelo jogador (se capturou o grupo)
     def checkLiberties(coordenadasLeft: List[Coord2D]): Boolean = {
       coordenadasLeft match {
         case Nil => true //se todas tinham pecas do jogador
@@ -243,9 +244,7 @@ object GameEngine {
       }
     }
 
-    //tira as pecas capturadas do ecra
-    //devia tb atualizar a lista de coordenadas livres para nao incluir as capturadas
-    @tailrec
+    @tailrec //tira as pecas dadas do ecra
     def atualizarBoard(currentBoard: Board, coordenadas: List[Coord2D]): Board = {
       coordenadas match{
         case Nil => currentBoard
@@ -281,34 +280,36 @@ object GameEngine {
           }
 
           atualizarBoard(removeStone(currentBoard, 0), xs)
+
         }
       }
     }
 
-    def checkGroups(possibleGroups: List[Coord2D]): (Board, Int) = {
+    //verifica cada grupo de pecas do adversario para ver se foram capturados
+    def checkGroups(possibleGroups: List[Coord2D], workingBoard: Board, currentCaptured: Int): (Board, Int) = {
       possibleGroups match{
-        case Nil => (board, 0) //se nao encontrou nenhum grupo capturado
+        case Nil => (workingBoard, currentCaptured) //se nao encontrou nenhum grupo capturado
         case x::xs => {
-          val (liberties, stones)= findGroup(List(x), List(), List()) //TESTADO
-          val captured= checkLiberties(liberties) //TESTADO
+          val (liberties, stones)= findGroup(List(x), List(), List())
+          val captured= checkLiberties(liberties)
 
           if(captured){
-            val novoBoard= atualizarBoard(board, stones)
+            val novoBoard= atualizarBoard(workingBoard, stones)
             val total= stones.size
 
-            (novoBoard, total)
+            checkGroups(xs, novoBoard, total+currentCaptured)
           }
           else{ //se nao capturou as pecas, devolve como estava
-            checkGroups(xs)
+            checkGroups(xs, workingBoard, currentCaptured)
           }
         }
       }
     }
 
     //codigo principal
-    val surrounding= getSurroundingStones(playerCoord) //TESTADO
-    val opponents= findOpponent(surrounding, List()) //TESTADO
-    checkGroups(opponents)
+    val surrounding= getSurroundingStones(playerCoord)
+    val opponents= findOpponent(surrounding, List())
+    checkGroups(opponents, board, 0)
   }
 
   //T6
@@ -331,6 +332,20 @@ object GameEngine {
   }
 
   def main(args: Array[String]): Unit = {
+    /*val board = List(
+      List(Stone.Black, Stone.White, Stone.Black, Stone.Empty, Stone.Empty),
+      List(Stone.Black, Stone.White, Stone.Black, Stone.Empty, Stone.Empty),
+      List(Stone.White, Stone.Black, Stone.Empty, Stone.Empty, Stone.Empty),
+      List(Stone.White, Stone.Black, Stone.Black, Stone.Empty, Stone.Black),
+      List(Stone.Black, Stone.Empty, Stone.Empty, Stone.Black, Stone.White))*/
+
+    /*val board = List(
+      List(Stone.Black, Stone.White, Stone.Empty, Stone.Empty, Stone.Empty),
+      List(Stone.Empty, Stone.White, Stone.Black, Stone.Empty, Stone.Empty),
+      List(Stone.White, Stone.Black, Stone.White, Stone.White, Stone.White),
+      List(Stone.White, Stone.White, Stone.Black, Stone.Black, Stone.Black),
+      List(Stone.Empty, Stone.Empty, Stone.White, Stone.White, Stone.White))*/
+
     val board = List(
       List(Stone.Black, Stone.White, Stone.Empty, Stone.Empty, Stone.Empty),
       List(Stone.Empty, Stone.White, Stone.Black, Stone.Empty, Stone.Empty),
@@ -358,14 +373,14 @@ object GameEngine {
     println("Player 2 Moves!")
     printBoard(newBoard)*/
 
-    val (board1, total1)= getGroupStones(board, player1, (0, 0)) //deve devolver o board antigo e 0
+    val (board1, total1)= getGroupStones(board, player1, (3, 4))
     println("Board1: "+total1)
     printBoard(board1)
     println("")
 
-    val (board2, total2)= getGroupStones(board, player1, (4, 3)) //deve devolver o board novo e 1
+    /*val (board2, total2)= getGroupStones(board, player2, (4, 4))
     println("Board2: "+total2)
     printBoard(board2)
-    println("")
+    println("")*/
   }
 }
