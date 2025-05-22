@@ -9,6 +9,7 @@ object GameEngine {
 
   type GameState = (Board, List[Coord2D])
   var jogadas: List[GameState] = List()
+  var peca: Boolean = true //vou usar isto para mudar das peças brancas para as pretas e vice versa
 
   //T1
   //ze :D
@@ -128,11 +129,11 @@ object GameEngine {
   //T4
   def printBoard(board: Board): Unit = {
     board match {
-      case x::Nil =>{
+      case x :: Nil => {
         printLine(x)
         println("")
       }
-      case x::xs => {
+      case x :: xs => {
         printLine(x)
         println("")
         printBoard(xs)
@@ -142,23 +143,23 @@ object GameEngine {
 
   def printLine(list: List[Stone]): Any = {
     list match {
-      case x::Nil =>{
-        if(x.toString == "Black") {
+      case x :: Nil => {
+        if (x.toString == "Black") {
           print(" B ")
-        } else if(x.toString == "White") {
+        } else if (x.toString == "White") {
           print(" W ")
-        } else if(x.toString == "Empty") {
+        } else if (x.toString == "Empty") {
           print(" - ")
         }
       }
-      case x::xs =>{
-        if(x.toString == "Black") {
+      case x :: xs => {
+        if (x.toString == "Black") {
           print(" B ")
           printLine(xs)
-        } else if(x.toString == "White") {
+        } else if (x.toString == "White") {
           print(" W ")
           printLine(xs)
-        } else if(x.toString == "Empty") {
+        } else if (x.toString == "Empty") {
           print(" - ")
           printLine(xs)
         }
@@ -187,23 +188,19 @@ object GameEngine {
         espera() // chamada recursiva da cena
       }
     }
+
     println("timer iniciado confia")
     espera()
     println("its joever")
+    changeTurno()
 
   }
 
-
-
+  def resetTimer(): Unit = {
+    timer()
+  }
 
   //System.currentTimeMillis()
-
-  //def timerUp()
-  //ainda nao sei o q por aqui
-
-
-
-
 
   def novaJogada(board: Board, livres: List[Coord2D]): Unit = {
     //por esta cena antes de cada jogada:   novaJogada(board, lstOpenCoords)
@@ -218,53 +215,157 @@ object GameEngine {
         None
       case anterior :: restantes =>
         jogadas = restantes
-        Some(anterior)
+        Some(anterior) //faz a cena
     }
   }
 
 
   //T8
+  //ta bue desorganizado, arruma-se dps
+  //
+  def newBoard(): Board = {
+    val board: List[List[Stone]] =
+      List(List(Stone.Empty, Stone.Empty, Stone.Empty),
+        List(Stone.Empty, Stone.Empty, Stone.Empty),
+        List(Stone.Empty, Stone.Empty, Stone.Empty))
+    board
+  }
+
+  def coorLivresIniciais(): List[(Int, Int)] = {
+    val lstOpenCoords: List[Coord2D] = List(
+      (0, 0), (0, 1), (0, 2),
+      (1, 0), (1, 2), (1, 2),
+      (2, 0), (2, 1), (2, 2)
+    )
+    lstOpenCoords
+  }
+
+  //getters que achei relevantes -- concha dont kill me pls
+//  def getBoardAtual(): Board = {
+//    jogadas.headOption match {
+//      case Some((boardAtual, _)) => boardAtual
+//      case None => newBoard() // fallback para tabuleiro novo se ainda não houve jogadas
+//    }
+//  }
+
+
+
+  //
+  def getCoordsLivres(): List[Coord2D] = {
+    jogadas.headOption match {
+      case Some((_, livres)) => livres
+      case None => coorLivresIniciais()
+    }
+  }
+
+
+  def isWaltuh(): Boolean = {
+    //peças brncas
+    if (peca)
+      true
+    else
+      false
+  }
+
+  def isGus(): Boolean = {
+    //peças pretas
+    if (isWaltuh())
+      false
+    else
+      true
+  }
+
+  def changeTurno(): Unit = {
+    resetTimer()
+    if (isWaltuh())
+      peca = false
+    else
+      //muda para as brancas
+      peca = true
+  }
+
+  def start(): Unit = {
+    //começa o relogio
+    //abre o jogo
+    //
+    novaJogada(newBoard(), coorLivresIniciais())
+   // printBoard(newBoard())
+    //timer()
+
+  }
+
+  def restart(): Unit = {
+    //recomeça o relógio
+    //volta ao inicio
+    novaJogada(newBoard(), coorLivresIniciais())
+    printBoard(newBoard())
+    resetTimer()
+
+  }
+
+  def saveGame(): Unit = {
+    //logo se vê
+    //acho que posso criar um ficheiro txt com as coordenadas e o turno
+  }
+
+
+  def pause(): Unit = {
+    //para o relogio
+    //nem vou fazer lol
+  }
+
 
   def main(args: Array[String]): Unit = {
-        val lstOpenCoords: List[Coord2D] = List(
-          (0, 0), (0, 1), (0, 2),
-          (1, 0), (1, 2),
-          (2, 0), (2, 1), (2, 2)
-        )
+    start()
 
-        val rand = new MyRandom(1L)
-        val size = lstOpenCoords.size
+    val lstOpenCoords: List[Coord2D] = List(
+      (0, 0), (0, 1), (0, 2),
+      (1, 0), (1, 1), (1, 2),
+      (2, 0), (2, 1), (2, 2)
+    )
 
-        val (valor1, nextR) = rand.nextInt(size)
-        val (valor2, tR) = nextR.nextInt(size)
-        val (valor3, fR) = tR.nextInt(size)
-        val (valor4, fiveR) = fR.nextInt(size)
+    //    val rand = new MyRandom(1L)
+    //    val size = lstOpenCoords.size
+    //
+    //    val (valor1, nextR) = rand.nextInt(size)
+    //    val (valor2, tR) = nextR.nextInt(size)
+    //    val (valor3, fR) = tR.nextInt(size)
+    //    val (valor4, fiveR) = fR.nextInt(size)
 
-        //println(valor1)
-        //println(valor2)
-        //println(valor3)
-        //println(valor4)
+    //println(valor1)
+    //println(valor2)
+    //println(valor3)
+    //println(valor4)
 
-        val (coord1, newRand) = randomMove(lstOpenCoords, rand)
-        val (coord2, nextRand) = randomMove(lstOpenCoords, rand) //igual ao 1
-        val (coord3, _) = randomMove(lstOpenCoords, nextRand) //differente dos dois
+    //    val (coord1, newRand) = randomMove(lstOpenCoords, rand)
+    //    val (coord2, nextRand) = randomMove(lstOpenCoords, rand) //igual ao 1
+    //    val (coord3, _) = randomMove(lstOpenCoords, nextRand) //differente dos dois
+    //
+    //    println(s"Primeira coordenada aleatória escolhida: $coord1")
+    //    println(s"Segunda coordenada aleatória escolhida: $coord2")
+    //    println(s"Terceira coordenada aleatória escolhida: $coord3")
 
-        println(s"Primeira coordenada aleatória escolhida: $coord1")
-        println(s"Segunda coordenada aleatória escolhida: $coord2")
-        println(s"Terceira coordenada aleatória escolhida: $coord3")
 
-
-        val board = List(List(Stone.Black, Stone.White, Stone.Empty),
-          List(Stone.Empty, Stone.White, Stone.Black),
-          List(Stone.White, Stone.Empty, Stone.Black))
+    val board = newBoard()
+    novaJogada(board, coorLivresIniciais())
+    //      List(
+    //        List(Stone.Empty, Stone.Empty, Stone.Empty),
+    //        List(Stone.Empty, Stone.Empty, Stone.Empty),
+    //        List(Stone.Empty, Stone.Empty, Stone.Empty)
+    //      )
 
     printBoard(board)
+    println()
 
-    println("timer ligado")
-    timer()
-    println("wake up joe")
+    //    println("timer ligado")
+    //    timer()
+    //    println("wake up joe")
 
     //novaJogada(board, lstOpenCoords)
+
+
+    val result = play(board, Stone.White, (0, 0), getCoordsLivres())
+    val updatedBoard = printPlayBoard(result)
 
   }
 }
