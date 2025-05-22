@@ -98,7 +98,6 @@ object GameEngine {
 
       val novoBoard = searchBoard(oldBoard, 0) //assumir q comecamos a contar em 0
       novoBoard //devolve board com stone nova
-
     }
 
     if (inList(cLivres)) { //se tiver
@@ -110,12 +109,10 @@ object GameEngine {
     else { //se nao tiver, devolver none e a lista como esta
       (None, cLivres)
     }
-
   }
 
   //T3
   def playRandomly(board: Board, r: MyRandom, player: Stone, lstOpenCoords: List[Coord2D], f: (List[Coord2D], MyRandom) => (Coord2D, MyRandom)):
-
   (Board, MyRandom, List[Coord2D]) = {
     val (coord, newR) = f(lstOpenCoords, r) // validate
     val (optBoard, newLstOpenCoords) = play(board, player, coord, lstOpenCoords)
@@ -126,18 +123,46 @@ object GameEngine {
       val newBoard = optBoard.get
       (newBoard, newR, newLstOpenCoords)
     }
-
-    //novaJogada(board, lstOpenCoords)
   }
 
   //T4
   def printBoard(board: Board): Unit = {
-    board.foreach { row =>
-      println(row.map {
-        case Stone.Black => "B"
-        case Stone.White => "W"
-        case Stone.Empty => "-"
-      }.mkString(" "))
+    board match {
+      case x::Nil =>{
+        printLine(x)
+        println("")
+      }
+      case x::xs => {
+        printLine(x)
+        println("")
+        printBoard(xs)
+      }
+    }
+  }
+
+  def printLine(list: List[Stone]): Any = {
+    list match {
+      case x::Nil =>{
+        if(x.toString == "Black") {
+          print(" B ")
+        } else if(x.toString == "White") {
+          print(" W ")
+        } else if(x.toString == "Empty") {
+          print(" - ")
+        }
+      }
+      case x::xs =>{
+        if(x.toString == "Black") {
+          print(" B ")
+          printLine(xs)
+        } else if(x.toString == "White") {
+          print(" W ")
+          printLine(xs)
+        } else if(x.toString == "Empty") {
+          print(" - ")
+          printLine(xs)
+        }
+      }
     }
   }
 
@@ -243,4 +268,3 @@ object GameEngine {
 
   }
 }
-

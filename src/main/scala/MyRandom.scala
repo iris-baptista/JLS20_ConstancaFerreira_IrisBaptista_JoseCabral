@@ -8,18 +8,21 @@ trait Random {
   def nextInt(sizeList: Int): (Int, Random)
 }
 
-case class MyRandom(seed: Long) extends Random { //seed equivalente a x na equacao y=f(x)
-  def nextInt(sizeList: Int): (Int, Random) = {
-
-    //deviamos por aquela cena da seed baseada no tempo
+case class MyRandom(seed: Long) { //seed equivalente a x na equacao y=f(x)
+  def nextInt(sizeList: Int): (Int, MyRandom) = {
     val newSeed = ((seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFFL) //L para long
 
     val bitsWanted= getBits(sizeList, 9) //9 e o maior possivel para qualquer board de go (da 512 valores, board maior tem 361)
     val shifts= 48-bitsWanted //seed tem 48 bits normalmente, shifts e os bits q vamos remover
-    val valorGerado = (newSeed >>> shifts).toInt //>>> faz shift to utmost left para limitar o valor
+    val valorGerado = (newSeed >>> shifts).toInt //>>> faz shift right para limitar o valor
 
     val newRandom = MyRandom(newSeed)
-    (valorGerado, newRandom)
+    if(valorGerado > sizeList || valorGerado < 0){ //se gerou um dos valores out of bounds
+      newRandom.nextInt(sizeList)
+    }
+    else {
+      (valorGerado, newRandom)
+    }
   }
 
   def getBits(max: Int, bitsPossible: Int): Int = {
