@@ -2,12 +2,14 @@ import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.{Parent, Scene}
 import javafx.scene.control.{Button, Label}
-import javafx.scene.layout.AnchorPane
+import javafx.scene.image.{Image, ImageView}
+import javafx.scene.layout.{AnchorPane, StackPane}
 //import javafx.scene.shape.{Rectangle}
 import javafx.fxml.FXMLLoader
 import javafx.scene.layout.GridPane
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+
 
 
 class SceneController {
@@ -78,5 +80,29 @@ class SceneController {
     val stage = label2.getScene.getWindow
     stage.hide()
     println("Shutting down...")
+  }
+
+  def showCredits(): Unit = {
+    // Carrega a imagem a partir dos resources
+    val imageUrl = getClass.getResource("/credits.png")
+    if (imageUrl == null) {
+      println("Imagem credits.png não encontrada!")
+      return
+    }
+
+    val image = new Image(imageUrl.toExternalForm)
+    val imageView = new ImageView(image)
+
+    // Ajusta o tamanho se necessário
+    imageView.setPreserveRatio(true)
+    imageView.setFitWidth(500)  // podes ajustar isto
+
+    val root = new StackPane(imageView)
+    val scene = new Scene(root, 600, 400)  // tamanho da janela
+
+    val stage = new Stage()
+    stage.setTitle("Créditos")
+    stage.setScene(scene)
+    stage.show()
   }
 }

@@ -5,6 +5,12 @@ object GameEngine {
   type Board = List[List[Stone]]
   type Coord2D = (Int, Int)
 
+  var jogadas: List[GameState] = List()
+  var gameStateAtual= GameState(0, 0, 0, Nil, Nil, Stone.Empty) //so para initializar
+  var currentThread= timer() //pode estar initializado mal
+  //var peca: Boolean = true //vou usar isto para mudar das peças brancas para as pretas e vice versa
+
+
   //T1
   //gerar uma coordenada aleatória
   //válida para a próxima jogada a partir da lista de posições livres fornecidas
@@ -241,6 +247,7 @@ object GameEngine {
     }
 
     //junta as listas dadas de forma a nao ter valores repetidos
+    @tailrec
     def joinLists(newL: List[Coord2D], currentL: List[Coord2D]): List[Coord2D] = {
       newL match{
         case Nil => currentL
@@ -343,10 +350,10 @@ object GameEngine {
 
   //T6
   //verifica se o computador ou o jogador ganhou o jogo (ou seja, se já foram capturadas o número de peças necessárias)
-  def seGanhou(gameState: GameState): Option[Stone] = {
-    val toWin= gameState.toWin
-    val captureW= gameState.captureWhite
-    val captureB= gameState.captureBlack
+  def seGanhou(): Option[Stone] = {
+    val toWin= gameStateAtual.toWin
+    val captureW= gameStateAtual.captureWhite
+    val captureB= gameStateAtual.captureBlack
 
     if(captureW == toWin){ //se branco ganhou
       return Some(Stone.White) //vou assumir q devolvemos a stone para o jogador q ganho
@@ -360,6 +367,134 @@ object GameEngine {
     None //nao precisa da palavra return
   }
 
+  //T7
+  def timer(): Thread = { //versão mais fixe
+    val t = new Thread() {
+      override //override para este exemplo especifico
+      def run(): Unit = {
+        val timeToPlay = 15 * 1000
+
+        try{
+          Thread.sleep(timeToPlay)
+          //se ja passaram os 15 segundos
+          if(gameStateAtual.currentPlayer == Stone.White){
+            gameStateAtual= GameState(gameStateAtual.toWin, gameStateAtual.captureWhite, gameStateAtual.captureBlack, gameStateAtual.board, gameStateAtual.freeCoord, Stone.Black)
+            currentThread= timer() //comeca novo timer para proxima jogada
+          }
+          else{
+            gameStateAtual= GameState(gameStateAtual.toWin, gameStateAtual.captureWhite, gameStateAtual.captureBlack, gameStateAtual.board, gameStateAtual.freeCoord, Stone.White)
+            currentThread= timer() //comeca novo timer para proxima jogada
+          }
+        }
+        catch{
+          case i: InterruptedException => {
+            //e interrompido quando joga
+            println("Uma peca foi jogada")
+          }
+        }
+      }
+    }
+
+    t.start()
+    t //devolve t
+  }
+
+  def undo(): Option[GameState] = { //mas dava para deixar tail recursive
+    jogadas match {
+      case Nil =>
+        println("nao da zezoca")
+        None
+      case anterior :: restantes =>
+        jogadas = restantes
+        gameStateAtual= restantes.head
+        Some(anterior) //faz a cena
+    }
+  }
+
+  //T8
+  def newBoard(coluna:Int, tempBoard:Board, tempList:List[Coord2D], linha:Int): (Board,List[Coord2D]) = {
+    if(linha > 0){
+      newBoard(coluna, createLine(coluna, Nil):: tempBoard, createCoor(coluna,tempList,linha ), linha-1)
+    }
+    else{
+      (tempBoard,tempList)
+    }
+  }
+
+  def createLine(a:Int, temp: List[Stone]):List[Stone] = {
+    if(a > 0){
+      createLine(a-1, Stone.Empty :: temp )
+    }
+    else {
+      temp
+    }
+  }
+
+  def createCoor(coluna: Int, temp:List[Coord2D], linha:Int): List[Coord2D]  = {
+    if( coluna > 0){
+      createCoor(coluna-1, (linha-1,coluna-1)::temp, linha)
+    }
+    else {
+      temp
+    }
+  }
+
+  def novaJogada(toWin: Int, captureWhite: Int, captureBlack: Int, board: Board, livres: List[Coord2D], nextPlayer: Stone): Unit = {
+    val estadoAtual = GameState(toWin, captureWhite, captureBlack, board, livres, nextPlayer)
+    jogadas = estadoAtual :: jogadas // Adiciona à head da lista (mais recente primeiro)
+    gameStateAtual= estadoAtual
+  }
+
+  def turno(coordJogada: Coord2D): Unit = {
+    val tabuleiro = gameStateAtual.board
+    val coordLivres = gameStateAtual.freeCoord
+    val player= gameStateAtual.currentPlayer
+
+    val (novoTabuleiro, novasLivres) = play(tabuleiro, player, coordJogada, coordLivres)
+    val optBoard = novoTabuleiro.getOrElse(None)
+    if(optBoard != None){ //se jogou numa posicao valida
+      val board = novoTabuleiro.get
+      val (capturedBoard, captured)  = getGroupStones(board, player, coordJogada)
+
+      if(player == Stone.White){
+        novaJogada(gameStateAtual.toWin, gameStateAtual.captureWhite+captured, gameStateAtual.captureBlack, capturedBoard, novasLivres, Stone.Black)
+
+        val optStone = seGanhou()
+        val winner = optStone.getOrElse(None)
+        if(winner != None){ //acaba jogo
+          println("u suck")
+        }
+        else{ //se ninguem ganho
+          currentThread.interrupt() //cancela o timer antigo
+          currentThread= timer() //recomeca um novo para o proximo turno
+        }
+      }
+      else{ //se for o jogador preto
+        novaJogada(gameStateAtual.toWin, gameStateAtual.captureWhite, gameStateAtual.captureBlack+captured, capturedBoard, novasLivres, Stone.White)
+
+        val optStone = seGanhou()
+        val winner = optStone.getOrElse(None)
+        if(winner != None){ //acaba jogo
+          println("u suck")
+        }
+        else{ //se ninguem ganhou
+          currentThread.interrupt() //cancela o timer antigo
+          currentThread= timer() //recomeca um novo
+        }
+      }
+    }
+    else{ //se nao jogou numa posicao valida
+      //msg ou nao faz nada?
+    }
+  }
+
+
+
+  def showCredits(): Unit = {
+
+  }
+
+  //Testes
   def main(args: Array[String]): Unit = {
     val board = List(
       List(Stone.Black, Stone.White, Stone.Empty, Stone.Empty, Stone.Empty),
@@ -373,7 +508,7 @@ object GameEngine {
     println("")
 
     val lstOpenCoords: List[Coord2D] = List((0, 2), (0, 3), (0, 4), (1, 0), (1, 3), (1, 4), (2, 1), (2, 3),
-        (2,4), (3, 1), (3, 3), (3,4), (4, 0), (4, 1), (4,2), (4,3), (4,4))
+      (2,4), (3, 1), (3, 3), (3,4), (4, 0), (4, 1), (4,2), (4,3), (4,4))
 
     val rand = new MyRandom(1L)
     val player1= Stone.Black
