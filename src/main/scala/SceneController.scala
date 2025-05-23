@@ -137,13 +137,14 @@ class SceneController {
     val stage = label2.getScene.getWindow.asInstanceOf[Stage]
     stage.setScene(new Scene(root))
 
-    if(GameEngine.winner == Stone.White){
-//      val winLabel = new Label()
-//      win.la
-      winningLabel.setText("White has won")
-    }
-    else{
-      winningLabel.setText("Black has won!")
+    // obter o controller associado ao gameOver.fxml
+    val controller = loader.getController[SceneController]
+
+    // alterar a label através do controller
+    if (GameEngine.winner == Stone.White) {
+      controller.winningLabel.setText("White has won")
+    } else {
+      controller.winningLabel.setText("Black has won!")
     }
   }
 
