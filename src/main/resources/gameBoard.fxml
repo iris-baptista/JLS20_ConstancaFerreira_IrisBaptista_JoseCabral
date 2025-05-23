@@ -30,5 +30,8 @@
           <RowConstraints minHeight="60.0" prefHeight="60.0" valignment="CENTER" vgrow="ALWAYS" />
         </rowConstraints>
       </GridPane>
+
+       <Button fx:id="undoButton" layoutX="409.0" layoutY="370.0" mnemonicParsing="false" onAction="#undoJogada" text="Undo" />
+
    </children>
 </AnchorPane>

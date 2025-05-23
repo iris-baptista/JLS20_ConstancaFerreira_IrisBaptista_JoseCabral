@@ -106,4 +106,11 @@ class SceneController {
     stage.hide()
     println("Shutting down...")
   }
+
+  @FXML
+  def undoJogada(): Unit = {
+    GameEngine.undo()
+    println("Jogada desfeita.")
+    // Se necessário, atualiza o tabuleiro no UI aqui
+  }
 }
