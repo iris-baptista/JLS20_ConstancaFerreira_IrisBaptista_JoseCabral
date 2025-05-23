@@ -3,18 +3,19 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
 <AnchorPane fx:id="label2" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url('background.jpg');-fx-background-size: cover;-fx-background-position: center;fx-background-repeat: no-repeat;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SceneController">
    <children>
       <TextFlow layoutX="409.0" layoutY="31.0" prefHeight="285.0" prefWidth="163.0" style="-fx-background-color: linear-gradient(to top,Grey, LightGrey); -fx-border-color: LightSlateGrey;" />
-      <Button layoutX="409.0" layoutY="332.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="117.0" text="Random Move" />
+      <Button layoutX="409.0" layoutY="332.0" mnemonicParsing="false" onMouseClicked="#randomPlay" prefHeight="25.0" prefWidth="117.0" text="Random Move" />
       <Button fx:id="exitButton2" layoutX="537.0" layoutY="332.0" mnemonicParsing="false" onMouseClicked="#exitGame" text="Exit" />
       <ImageView fitHeight="300.0" fitWidth="300.0" layoutX="41.0" layoutY="45.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@tabuleiro.png" />
          </image></ImageView>
-      <GridPane layoutX="41.0" layoutY="45.0">
+      <GridPane fx:id="board" layoutX="41.0" layoutY="45.0">
         <columnConstraints>
           <ColumnConstraints hgrow="ALWAYS" minWidth="60.0" prefWidth="60.0" />
             <ColumnConstraints hgrow="ALWAYS" minWidth="60.0" prefWidth="60.0" />
@@ -29,9 +30,37 @@
             <RowConstraints minHeight="60.0" prefHeight="60.0" valignment="CENTER" vgrow="ALWAYS" />
           <RowConstraints minHeight="60.0" prefHeight="60.0" valignment="CENTER" vgrow="ALWAYS" />
         </rowConstraints>
+         <children>
+            <Circle fx:id="s00" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="s01" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="1" />
+            <Circle fx:id="s02" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="2" />
+            <Circle fx:id="s03" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="3" />
+            <Circle fx:id="s04" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="4" />
+            <Circle fx:id="s10" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.rowIndex="1" />
+            <Circle fx:id="s11" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Circle fx:id="s12" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Circle fx:id="s13" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+            <Circle fx:id="s14" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+            <Circle fx:id="s20" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.rowIndex="2" />
+            <Circle fx:id="s21" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Circle fx:id="s22" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Circle fx:id="s23" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <Circle fx:id="s24" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+            <Circle fx:id="s30" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.rowIndex="3" />
+            <Circle fx:id="s31" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Circle fx:id="s32" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+            <Circle fx:id="s33" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+            <Circle fx:id="s34" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+            <Circle fx:id="s40" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.rowIndex="4" />
+            <Circle fx:id="s41" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Circle fx:id="s42" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+            <Circle fx:id="s43" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+            <Circle fx:id="s44" fill="DODGERBLUE" onMouseClicked="#play" opacity="0.0" radius="30.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+         </children>
       </GridPane>
 
        <Button fx:id="undoButton" layoutX="409.0" layoutY="370.0" mnemonicParsing="false" onAction="#undoJogada" text="Undo" />
+       <Button fx:id="resetButton" layoutX="490.0" layoutY="370.0" mnemonicParsing="false" onAction="#resetJogo" text="Reset" />
 
    </children>
 </AnchorPane>

@@ -1,14 +1,10 @@
 import scala.math.pow
 
 object MyRandom {
-  def nextInt(): (Int, Random) = MyRandom.nextInt()
+  def nextInt(): (Int, MyRandom) = MyRandom.nextInt()
 }
 
-trait Random {
-  def nextInt(sizeList: Int): (Int, Random)
-}
-
-case class MyRandom(seed: Long) extends Random { //seed equivalente a x na equacao y=f(x)
+case class MyRandom(seed: Long) { //seed equivalente a x na equacao y=f(x)
   def nextInt(sizeList: Int): (Int, MyRandom) = {
     val newSeed = ((seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFFL) //L para long
 

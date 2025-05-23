@@ -1,11 +1,9 @@
 import javafx.fxml.{FXML, FXMLLoader}
+import javafx.scene.control.TextField
 import javafx.scene.image.{Image, ImageView}
 import javafx.scene.layout.{StackPane, VBox}
 import javafx.scene.{Parent, Scene}
-import javafx.scene.control.TextField
 import javafx.stage.Stage
-
-import java.awt.event.ActionEvent
 
 class OptionsController {
 
