@@ -4,6 +4,8 @@ import scala.annotation.tailrec
 object GameEngine {
   type Board = List[List[Stone]]
   type Coord2D = (Int, Int)
+  var jogadas: List[GameState] = List()
+  var peca: Boolean = true //vou usar isto para mudar das peças brancas para as pretas e vice versa
 
   //T1
   //gerar uma coordenada aleatória
@@ -359,6 +361,117 @@ object GameEngine {
     //se nao encontrou
     None //nao precisa da palavra return
   }
+
+  def turno(c:Coord2D, gameState: GameState, player:Stone):GameState= {
+    val novoTabuleiro = gameState.board
+    val coorLivres = gameState.freeCoord
+
+    val (novaPlay, novasLivres) = play(novoTabuleiro, player, c, coorLivres)
+    val optBoard = novaPlay.getOrElse(None)
+    if (optBoard != None) {
+      val tpoBoard = novaPlay.get
+      val (capturedBoard, captured) = getGroupStones(tpoBoard, player, c)
+
+      if (player == Stone.White) {
+        val novoGameState = novaJogada(gameState.toWin, gameState.captureWhite + captured, gameState.captureBlack, capturedBoard, novasLivres)
+        val optStone = seGanhou(novoGameState)
+        val winner = optStone.getOrElse(None)
+        if (winner != None) {
+          println("u suck")
+        } else {
+          //changeTurno()
+        }
+
+      } else {
+        val novoGameState = novaJogada(gameState.toWin, gameState.captureWhite, gameState.captureBlack + captured, capturedBoard, novasLivres)
+        val optStone = seGanhou(novoGameState)
+        val winner = optStone.getOrElse(None)
+        if (winner != None) {
+          println("u suck")
+        } else {
+          //changeTurno()
+        }
+
+      }
+  }
+
+  def newBoard(coluna:Int, tempBoard:Board, tempList:List[Coord2D], linha:Int): (Board,List[Coord2D]) = {
+
+    if(linha>0){
+
+      newBoard(coluna, createLine(coluna, Nil):: tempBoard,createCoor(coluna,tempList,linha ),linha-1)
+    }else{
+      (tempBoard,tempList)
+    }
+
+  }
+
+  def createLine(a:Int, temp: List[Stone]):List[Stone] = {
+    if( a > 0){
+      createLine(a-1, Stone.Empty :: temp )
+
+    }else {
+      temp
+
+    }
+
+  }
+
+  def createCoor(coluna: Int, temp:List[Coord2D], linha:Int): List[Coord2D]  = {
+    if( coluna > 0){
+      createCoor(coluna-1, (linha-1,coluna-1)::temp, linha)
+
+    }else {
+      temp
+
+    }
+  }
+
+  //achei q podia usar folding, o chat discordou ;_;
+  def undo(): Option[GameState] = { //mas dava para deixar tail recursive
+    jogadas match {
+      case Nil =>
+        println("nao da zezoca")
+        None
+      case anterior :: restantes =>
+        jogadas = restantes
+        Some(anterior) //faz a cena
+    }
+  }
+
+  def novaJogada(toWin: Int, captureWhite: Int, captureBlack: Int, board: Board, livres: List[Coord2D]): Unit = {
+    //BUEDA IMPORTANTE
+    val estadoAtual = GameState(toWin, captureWhite, captureBlack, board, livres)
+    jogadas = estadoAtual :: jogadas // Adiciona à head da lista (mais recente primeiro)
+
+    estadoAtual
+  }
+
+    def timer(): Unit = { //versão mais fixe
+      val t = new Thread() {
+        override //override para este exemplo especifico
+        def run(): Unit = {
+          val inicio = System.currentTimeMillis()
+          val joever = 15 * 1000
+
+          println("timer iniciado confia")
+
+          @tailrec
+          def espera(): Unit = { // espera até os 15s passarem
+            val agora = System.currentTimeMillis()
+            if (agora - inicio < joever) {
+              espera()
+            }
+          }
+
+          espera()
+          println("its joever")
+          //changeTurno()
+        }
+      }
+
+      t.start()
+    }
 
   def main(args: Array[String]): Unit = {
     val board = List(
