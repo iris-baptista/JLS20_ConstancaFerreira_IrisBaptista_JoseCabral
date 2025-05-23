@@ -9,7 +9,6 @@ object GameEngine {
   var gameStateAtual = GameState(0, 0, 0, Nil, Nil, Stone.Empty) //so para initializar
   var currentThread = new Thread() //pode estar initializado mal
   var winner= Stone.Empty
-
   var tempoDeJogada = 15
   var numeroDeCapturas = 5
   //var peca: Boolean = true //vou usar isto para mudar das peças brancas para as pretas e vice versa
@@ -486,6 +485,47 @@ object GameEngine {
       }
     } else{ //se nao jogou numa posicao valida
       println("Jogada não válida!")
+    }
+  }
+
+  def turnoRandom(): Coord2D = {
+    val tabuleiro = gameStateAtual.board
+    val coordLivres = gameStateAtual.freeCoord
+    val player= gameStateAtual.currentPlayer
+
+    val rand = new MyRandom(System.currentTimeMillis())
+    val (novoTabuleiro, novoRandom, novasLivres) = playRandomly(tabuleiro, rand, player, coordLivres, randomMove)
+    val (coordJogada, _)= randomMove(coordLivres, rand)
+
+    currentThread.interrupt() //cancela o timer antigo para nao fazer time out
+    val (capturedBoard, captured)= getGroupStones(novoTabuleiro, player, coordJogada)
+
+    if(player == Stone.White){
+      novaJogada(gameStateAtual.toWin, gameStateAtual.captureWhite+captured, gameStateAtual.captureBlack, capturedBoard, novasLivres, Stone.Black)
+
+      val optStone = seGanhou()
+      val ganhou = optStone.getOrElse(None)
+      if(ganhou != None){ //acaba jogo
+        winner= optStone.get
+        coordJogada
+      }
+      else{ //se ninguem ganho
+        currentThread= timer() //recomeca um novo timer para o proximo turno
+        coordJogada
+      }
+    }
+    else{ //se for o jogador preto
+      novaJogada(gameStateAtual.toWin, gameStateAtual.captureWhite, gameStateAtual.captureBlack+captured, capturedBoard, novasLivres, Stone.White)
+
+      val optStone = seGanhou()
+      val winner = optStone.getOrElse(None)
+      if(winner != None){ //acaba jogo
+        currentThread.interrupt()
+        coordJogada
+      } else { //se ninguem ganhou
+        currentThread= timer() //recomeca um novo
+        coordJogada
+      }
     }
   }
 

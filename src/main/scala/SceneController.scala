@@ -6,7 +6,7 @@ import javafx.application.Platform
 import javafx.scene.layout.{AnchorPane, GridPane, VBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
-import javafx.scene.text.TextFlow
+import javafx.scene.text.{Text, TextFlow}
 import javafx.scene.{Parent, Scene}
 import javafx.stage.Stage
 import GameEngine.Board
@@ -19,8 +19,6 @@ class SceneController {
   private var gameTitle: Label = _
   @FXML
   private var startButton: Button = _
-  @FXML
-  private var exitButton1: Button = _
   @FXML
   private var option: Button = _
 
@@ -57,24 +55,26 @@ class SceneController {
   }
 
   @FXML
-  private var state: TextFlow = _
+  private var textBox: TextFlow = _
   @FXML
   private var label2: AnchorPane = _
-  @FXML
-  private var randomMove: Button = _
-  @FXML
-  private var board: GridPane = _
-  @FXML
-  private var exitButton2: Button = _
   @FXML
   private var winningLabel: Label= _
 
   // gameBoard!
   def randomPlay(): Unit = {
+    val coordenate= GameEngine.turnoRandom()
 
-    //GameEngine.playRandomly()
-    //atualizarEcra()
-    //println("Jogada aleatória!") TEXTFLOW
+    val tabuleiro = GameEngine.gameStateAtual.board
+    GameEngine.printBoard(tabuleiro)
+
+    //atualizar ecra
+    atualizarEcra(tabuleiro, 0)
+    textBox.getChildren.add(new Text("Peça jogada na posição "+coordenate+"\n"))
+
+    if(GameEngine.winner != Stone.Empty){
+      switchToGameOver()
+    }
   }
 
   def play(event: javafx.scene.input.MouseEvent): Unit = {
@@ -89,12 +89,11 @@ class SceneController {
     val tabuleiro = GameEngine.gameStateAtual.board
     GameEngine.printBoard(tabuleiro)
 
-    println("A atualizar ecrã...")
     //atualizar ecra
     atualizarEcra(tabuleiro, 0)
-    print("Peça jogada!")
+    textBox.getChildren.add(new Text("Peça jogada na posição "+coordenate+"\n"))
+
     if(GameEngine.winner != Stone.Empty){
-      println("oi")
       switchToGameOver()
     }
   }
@@ -131,26 +130,44 @@ class SceneController {
     }
   }
 
+  @FXML
   def switchToGameOver()={
     val loader = new FXMLLoader(getClass.getResource("gameOver.fxml"))
     val root: Parent = loader.load()
     val stage = label2.getScene.getWindow.asInstanceOf[Stage]
     stage.setScene(new Scene(root))
 
-    println("yolo")
     if(GameEngine.winner == Stone.White){
-      println("bruh")
+//      val winLabel = new Label()
+//      win.la
       winningLabel.setText("White has won")
     }
     else{
       winningLabel.setText("Black has won!")
     }
-
   }
 
   def exitGame(): Unit = {
     GameEngine.currentThread.interrupt()
     Platform.exit()
     println("Shutting down...")
+  }
+
+  @FXML
+  def undoJogada(): Unit = {
+    GameEngine.undo()
+    println("Jogada desfeita.")
+    val tabuleiroAtualizado = GameEngine.gameStateAtual.board
+    atualizarEcra(tabuleiroAtualizado, 0)
+
+    textBox.getChildren.add(new Text("Undo Last Move\n"))
+  }
+
+  @FXML
+  def resetJogo(): Unit = {
+    GameEngine.startGame() // Reinicia o estado do jogo
+    atualizarEcra(GameEngine.gameStateAtual.board, 0)
+
+    textBox.getChildren.add(new Text("Game Reset\n"))
   }
 }
