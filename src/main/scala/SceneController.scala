@@ -25,13 +25,10 @@ class SceneController {
   //private var state: TextFlow = _
   @FXML
   private var board: GridPane = _
-
   @FXML
   private var label1: AnchorPane = _
-
   @FXML
   private var label2: AnchorPane = _
-
 
   // Main Menu!
   def changeColor() = {
@@ -47,6 +44,8 @@ class SceneController {
     val root: Parent = loader.load()
     val stage = startButton.getScene.getWindow.asInstanceOf[Stage]
     stage.setScene(new Scene(root))
+
+
   }
 
   def exitMenu(): Unit = {
