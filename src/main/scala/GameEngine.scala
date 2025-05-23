@@ -477,39 +477,38 @@ object GameEngine {
   //T8
   //ta bue desorganizado, arruma-se dps
   //
-  def newBoard(a:Int,tempBoard:Board): Board = {
-//    val board: List[List[Stone]] =
-//      List(List(Stone.Empty, Stone.Empty, Stone.Empty),
-//        List(Stone.Empty, Stone.Empty, Stone.Empty),
-//        List(Stone.Empty, Stone.Empty, Stone.Empty))
+  def newBoard(coluna:Int, tempBoard:Board, tempList:List[Coord2D], linha:Int): (Board,List[Coord2D]) = {
 
-    if(a<0){
-      newBoard(a-1, createLine(a, Nil):: tempBoard)
+    if(linha>0){
+
+      newBoard(coluna, createLine(coluna, Nil):: tempBoard,createCoor(coluna,tempList,linha ),linha-1)
     }else{
-      tempBoard
+      (tempBoard,tempList)
     }
 
   }
 
   private def createLine(a:Int, temp: List[Stone]):List[Stone] = {
-    if( a < 0){
+    if( a > 0){
       createLine(a-1, Stone.Empty :: temp )
 
     }else {
-      print(temp)
       temp
 
     }
 
   }
 
-  def coorLivresIniciais(): List[(Int, Int)] = {
-    val lstOpenCoords: List[Coord2D] = List(
-      (0, 0), (0, 1), (0, 2),
-      (1, 0), (1, 2), (1, 2),
-      (2, 0), (2, 1), (2, 2)
-    )
-    lstOpenCoords
+
+
+  def createCoor(coluna: Int, temp:List[Coord2D], linha:Int): List[Coord2D]  = {
+    if( coluna > 0){
+      createCoor(coluna-1, (linha-1,coluna-1)::temp, linha)
+
+    }else {
+      temp
+
+    }
   }
 
   //getters que achei relevantes -- concha dont kill me pls
@@ -561,9 +560,10 @@ object GameEngine {
   def start(): Unit = {
     //começa o relogio
     //abre o jogo
-
-    novaJogada(5,0,0,newBoard(5, Nil), coorLivresIniciais())
-    printBoard(newBoard(5,Nil))
+     val (cena,outracena) = newBoard(5, Nil,Nil,5)
+    novaJogada(5,0,0,cena,outracena)
+    //switch to game
+    printBoard(cena)
     println()
     timer()
 
@@ -572,8 +572,8 @@ object GameEngine {
   def restart(): Unit = {
     //recomeça o relógio
     //volta ao inicio
-    novaJogada(5,0,0,newBoard(5,Nil), coorLivresIniciais())
-    printBoard(newBoard(5,Nil))
+   // novaJogada(5,0,0,newBoard(5,Nil,5), coorLivresIniciais())
+  //  printBoard(newBoard(5,Nil,5))
     //resetTimer()
 
   }
@@ -592,7 +592,10 @@ object GameEngine {
 
   def main(args: Array[String]): Unit = {
 
-    printBoard(newBoard(5,Nil))
+   val (lal, coordNovas) = newBoard(5,Nil,Nil,5 )
+    printBoard(lal)
+    println(coordNovas)
+
 
 
 
