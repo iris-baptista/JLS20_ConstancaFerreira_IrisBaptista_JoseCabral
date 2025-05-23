@@ -61,12 +61,12 @@ class SceneController {
   }
 
   def play(): Unit = {
-    val event = javafx.scene.input.MouseEvent
-    val clickedNode = event.getPickResult.getIntersectedNode
-    if(clickedNode != board) {
-      val colIndex = GridPane.getColumnIndex(clickedNode)
-      val rowIndex = GridPane.getRowIndex(clickedNode)
-      println("Mouse clicked on: " + colIndex + ", " + rowIndex)
+//    val event = javafx.scene.input.MouseEvent
+//    val clickedNode = event.getPickResult.getIntersectedNode
+//    if(clickedNode != board) {
+//      val colIndex = GridPane.getColumnIndex(clickedNode)
+//      val rowIndex = GridPane.getRowIndex(clickedNode)
+//      println("Mouse clicked on: " + colIndex + ", " + rowIndex)
     val circle = new Circle()
     circle.setRadius(30)
     circle.setFill(Color.BLACK)
