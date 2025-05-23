@@ -5,7 +5,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="label2" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url('file:/C:/Users/alex2/Downloads/background.jpg');-fx-background-size: cover;-fx-background-position: center;fx-background-repeat: no-repeat;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SceneController">
+<AnchorPane fx:id="label2" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url('background.jpg');-fx-background-size: cover;-fx-background-position: center;fx-background-repeat: no-repeat;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SceneController">
     <children>
         <TextFlow layoutX="409.0" layoutY="31.0" prefHeight="285.0" prefWidth="163.0" style="-fx-background-color: linear-gradient(to top,Grey, LightGrey); -fx-border-color: LightSlateGrey;" />
         <Button layoutX="409.0" layoutY="332.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="117.0" text="Random Move" />
