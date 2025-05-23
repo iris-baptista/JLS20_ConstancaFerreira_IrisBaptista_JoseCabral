@@ -1,12 +1,16 @@
 import GameEngine.gameStateAtual
 import javafx.fxml.{FXML, FXMLLoader}
 import javafx.scene.control.{Button, Label}
+import GameEngine.Coord2D
+import javafx.application.Platform
 import javafx.scene.layout.{AnchorPane, GridPane, VBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.text.TextFlow
 import javafx.scene.{Parent, Scene}
 import javafx.stage.Stage
+import GameEngine.Board
+import Stone.Stone
 
 class SceneController {
   @FXML
@@ -17,6 +21,8 @@ class SceneController {
   private var startButton: Button = _
   @FXML
   private var exitButton1: Button = _
+  @FXML
+  private var option: Button = _
 
   // Main Menu!
   def changeColor() = {
@@ -37,9 +43,19 @@ class SceneController {
     GameEngine.startGame()
   }
 
+  def switchToOptions() = {
+    val loader = new FXMLLoader(getClass.getResource("options.fxml"))
+    val root: Parent = loader.load()
+    val stage = option.getScene.getWindow.asInstanceOf[Stage]
+    stage.setScene(new Scene(root))
+
+    //switch to game
+    //GameEngine.options()
+  }
+
   def exitMenu(): Unit = {
-    val stage = label1.getScene.getWindow
-    stage.hide()
+    val stage = label1.getScene.getWindow.asInstanceOf[Stage]
+    stage.close()
     println("Shutting down...")
   }
 
@@ -56,30 +72,78 @@ class SceneController {
 
   // gameBoard!
   def randomPlay(): Unit = {
+
     //GameEngine.playRandomly()
+    //atualizarEcra()
     //println("Jogada aleatória!") TEXTFLOW
   }
 
-  def play(): Unit = {
-//    val event = javafx.scene.input.MouseEvent
-//    val clickedNode = event.getPickResult.getIntersectedNode
-//    if(clickedNode != board) {
-//      val colIndex = GridPane.getColumnIndex(clickedNode)
-//      val rowIndex = GridPane.getRowIndex(clickedNode)
-//      println("Mouse clicked on: " + colIndex + ", " + rowIndex)
-    val circle = new Circle()
-    circle.setRadius(30)
-    circle.setFill(Color.BLACK)
-     board.add(circle,1,3)
+  def play(event: javafx.scene.input.MouseEvent): Unit = {
+    val clickedNode = event.getPickResult.getIntersectedNode
+    val colIndex = GridPane.getColumnIndex(clickedNode)
+    val rowIndex = GridPane.getRowIndex(clickedNode)
+    println("Mouse clicked on: " + rowIndex + ", " + colIndex)
+
+    val coordenate = (rowIndex.toInt, colIndex.toInt)
+    GameEngine.turno(coordenate) //fazer jogada
+
+    val tabuleiro = GameEngine.gameStateAtual.board
+    GameEngine.printBoard(tabuleiro)
+
+    println("A atualizar ecrã...")
+    //atualizar ecra
+    atualizarEcra(tabuleiro, 0)
+    print("Peça jogada!")
+    if(GameEngine.winner != Stone.Empty){
+      switchToGameOver()
+    }
   }
 
-    //val play = (x,y)
-    //val gameState = GameEngine.
-    //GameEngine.play(play, )
+  def atualizarEcra(boardAtual: Board, rowIndex: Int): Unit={
+    boardAtual match {
+      case Nil => println("Ecrã atualizado!")
+      case x::xs => {
+        atualizarLinha(x, rowIndex, 0)
+        atualizarEcra(xs, rowIndex+1)
+      }
+    }
+  }
+
+  def atualizarLinha(line: List[Stone], rowIndex: Int, colIndex: Int): Unit = {
+    val scene = label2.getScene
+    line match {
+      case Nil => return
+      case x::xs => {
+        val circle = scene.lookup("#s"+rowIndex+colIndex).asInstanceOf[Circle]
+        if(x == Stone.Black){
+          circle.setFill(Color.BLACK)
+          circle.setOpacity(1)
+        } else if(x == Stone.White) {
+          circle.setFill(Color.WHITE)
+          circle.setOpacity(1)
+        } else {
+          val old= GameEngine.gameStateAtual
+          GameEngine.gameStateAtual= GameState(old.toWin, old.captureWhite, old.captureBlack, old.board, (rowIndex, colIndex)::old.freeCoord, old.currentPlayer)
+          circle.setOpacity(0)
+        }
+        atualizarLinha(xs, rowIndex, colIndex+1)
+      }
+    }
+  }
+
+  def switchToGameOver()={
+    val loader = new FXMLLoader(getClass.getResource("gameOver.fxml"))
+    val root: Parent = loader.load()
+    val stage = startButton.getScene.getWindow.asInstanceOf[Stage]
+    stage.setScene(new Scene(root))
+
+    //switch to game
+    GameEngine.startGame()
+  }
 
   def exitGame(): Unit = {
-    val stage = label2.getScene.getWindow
-    stage.hide()
+    GameEngine.currentThread.interrupt()
+    Platform.exit()
     println("Shutting down...")
   }
 }

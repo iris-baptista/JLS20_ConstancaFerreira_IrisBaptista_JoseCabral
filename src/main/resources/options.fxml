@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox fx:id="bg" alignment="CENTER" spacing="10.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url('background.jpg');" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="OptionsController">
+   <children>
+      <Button fx:id="credits" mnemonicParsing="false" onMouseClicked="#showCredits" text="Créditos" />
+
+      <HBox alignment="CENTER" spacing="5.0">
+         <children>
+            <TextField fx:id="tempoTextField" promptText="Insira o tempo em segundos" />
+            <Button fx:id="tempoDeJogada" mnemonicParsing="false" onAction="#mudarTempoDeJogada" text="Tempo de Jogada" />
+         </children>
+      </HBox>
+
+      <HBox alignment="CENTER" spacing="5.0">
+         <children>
+            <TextField fx:id="capturasTextField" promptText="Insira o número de capturas" />
+            <Button fx:id="numeroDeCapturasBtn" mnemonicParsing="false" onAction="#mudarNumeroDeCapturas" text="Número de Capturas" />
+         </children>
+      </HBox>
+
+      <HBox alignment="BASELINE_LEFT" prefWidth="600.0" style="-fx-padding: 10;">
+         <children>
+            <Button fx:id="voltarMenuBtn" mnemonicParsing="false" onAction="#voltarMenu" text="Voltar ao Menu" />
+         </children>
+      </HBox>
+
+   </children>
+</VBox>
+
+
+
+
+

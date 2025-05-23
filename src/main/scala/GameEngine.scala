@@ -8,6 +8,10 @@ object GameEngine {
   var jogadas: List[GameState] = List()
   var gameStateAtual = GameState(0, 0, 0, Nil, Nil, Stone.Empty) //so para initializar
   var currentThread = new Thread() //pode estar initializado mal
+  var winner= Stone.Empty
+
+  var tempoDeJogada = 15
+  var numeroDeCapturas = 5
   //var peca: Boolean = true //vou usar isto para mudar das peças brancas para as pretas e vice versa
 
   //T1
@@ -371,11 +375,12 @@ object GameEngine {
     val t = new Thread() {
       override //override para este exemplo especifico
       def run(): Unit = {
-        val timeToPlay = 15 * 1000
+        val timeToPlay = tempoDeJogada * 1000
 
         try{
           Thread.sleep(timeToPlay)
           //se ja passaram os 15 segundos
+          print("Mudou jogador")
           if(gameStateAtual.currentPlayer == Stone.White){
             gameStateAtual= GameState(gameStateAtual.toWin, gameStateAtual.captureWhite, gameStateAtual.captureBlack, gameStateAtual.board, gameStateAtual.freeCoord, Stone.Black)
             currentThread= timer() //comeca novo timer para proxima jogada
@@ -388,7 +393,7 @@ object GameEngine {
         catch{
           case i: InterruptedException => {
             //e interrompido quando joga
-            println("Uma peca foi jogada")
+            println("interrompido!")
           }
         }
       }
@@ -452,20 +457,20 @@ object GameEngine {
     val (novoTabuleiro, novasLivres) = play(tabuleiro, player, coordJogada, coordLivres)
     val optBoard = novoTabuleiro.getOrElse(None)
     if(optBoard != None){ //se jogou numa posicao valida
+      currentThread.interrupt() //cancela o timer antigo para nao fazer time out
       val board = novoTabuleiro.get
-      val (capturedBoard, captured)  = getGroupStones(board, player, coordJogada)
+      val (capturedBoard, captured)= getGroupStones(board, player, coordJogada)
 
       if(player == Stone.White){
         novaJogada(gameStateAtual.toWin, gameStateAtual.captureWhite+captured, gameStateAtual.captureBlack, capturedBoard, novasLivres, Stone.Black)
 
         val optStone = seGanhou()
-        val winner = optStone.getOrElse(None)
-        if(winner != None){ //acaba jogo
-          println("u suck")
+        val ganhou = optStone.getOrElse(None)
+        if(ganhou != None){ //acaba jogo
+          winner= optStone.get
         }
         else{ //se ninguem ganho
-          currentThread.interrupt() //cancela o timer antigo
-          currentThread= timer() //recomeca um novo para o proximo turno
+          currentThread= timer() //recomeca um novo timer para o proximo turno
         }
       }
       else{ //se for o jogador preto
@@ -474,22 +479,19 @@ object GameEngine {
         val optStone = seGanhou()
         val winner = optStone.getOrElse(None)
         if(winner != None){ //acaba jogo
-          println("u suck")
-        }
-        else{ //se ninguem ganhou
-          currentThread.interrupt() //cancela o timer antigo
+          currentThread.interrupt()
+        } else { //se ninguem ganhou
           currentThread= timer() //recomeca um novo
         }
       }
-    }
-    else{ //se nao jogou numa posicao valida
-      //msg ou nao faz nada?
+    } else{ //se nao jogou numa posicao valida
+      println("Jogada não válida!")
     }
   }
 
   def startGame() = {
     val (blankBoard, freeCoords) = newBoard(5,Nil,Nil,5)
-    gameStateAtual = GameState(5,0,0,blankBoard, freeCoords, Stone.Black)
+    gameStateAtual = GameState(numeroDeCapturas,0,0,blankBoard, freeCoords, Stone.Black)
     jogadas = List(gameStateAtual)
     currentThread.interrupt()
     currentThread = timer()

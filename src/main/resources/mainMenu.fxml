@@ -12,6 +12,7 @@
          </font>
       </Label>
         <Button fx:id="startButton" layoutX="235.0" layoutY="175.0" mnemonicParsing="false" onMouseClicked="#switchToGame" prefHeight="25.0" prefWidth="169.0" text="Start Game" />
+        <Button fx:id="option" layoutX="235.0" layoutY="217.0" mnemonicParsing="false" onMouseClicked="#switchToOptions" prefHeight="25.0" prefWidth="169.0" text="Options" />
         <Button layoutX="235.0" layoutY="259.0" mnemonicParsing="false" onMouseClicked="#exitMenu" prefHeight="25.0" prefWidth="169.0" text="Exit" />
     </children>
 </VBox>
