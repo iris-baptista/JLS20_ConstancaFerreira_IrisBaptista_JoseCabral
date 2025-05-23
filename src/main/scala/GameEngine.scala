@@ -6,10 +6,11 @@ object GameEngine {
   type Coord2D = (Int, Int)
 
   var jogadas: List[GameState] = List()
-  var gameStateAtual= GameState(0, 0, 0, Nil, Nil, Stone.Empty) //so para initializar
-  var currentThread= timer() //pode estar initializado mal
+  var gameStateAtual = GameState(0, 0, 0, Nil, Nil, Stone.Empty) //so para initializar
+  var currentThread = new Thread() //pode estar initializado mal
+  var tempoDeJogada = 15
+  var numeroDeCapturas = 5
   //var peca: Boolean = true //vou usar isto para mudar das peças brancas para as pretas e vice versa
-
 
   //T1
   //gerar uma coordenada aleatória
@@ -372,7 +373,7 @@ object GameEngine {
     val t = new Thread() {
       override //override para este exemplo especifico
       def run(): Unit = {
-        val timeToPlay = 15 * 1000
+        val timeToPlay = tempoDeJogada * 1000
 
         try{
           Thread.sleep(timeToPlay)
@@ -488,10 +489,12 @@ object GameEngine {
     }
   }
 
-
-
-  def showCredits(): Unit = {
-
+  def startGame() = {
+    val (blankBoard, freeCoords) = newBoard(5,Nil,Nil,5)
+    gameStateAtual = GameState(numeroDeCapturas,0,0,blankBoard, freeCoords, Stone.Black)
+    jogadas = List(gameStateAtual)
+    currentThread.interrupt()
+    currentThread = timer()
   }
 
   //Testes

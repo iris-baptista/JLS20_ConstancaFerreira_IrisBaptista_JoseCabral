@@ -1,38 +1,30 @@
-import javafx.event.ActionEvent
-import javafx.fxml.FXML
-import javafx.scene.{Parent, Scene}
+import GameEngine.gameStateAtual
+import javafx.fxml.{FXML, FXMLLoader}
 import javafx.scene.control.{Button, Label}
-import javafx.scene.image.{Image, ImageView}
-import javafx.scene.layout.{AnchorPane, StackPane}
-//import javafx.scene.shape.{Rectangle}
-import javafx.fxml.FXMLLoader
-import javafx.scene.layout.GridPane
+import javafx.scene.layout.{AnchorPane, GridPane, VBox}
 import javafx.scene.paint.Color
+import javafx.scene.shape.Circle
+import javafx.scene.text.TextFlow
+import javafx.scene.{Parent, Scene}
 import javafx.stage.Stage
-
+import javafx.scene.media.{Media, MediaPlayer}
+import java.io.File
 
 
 class SceneController {
-
+  @FXML
+  private var label1: VBox = _
+  @FXML
+  private var gameTitle: Label = _
   @FXML
   private var startButton: Button = _
   @FXML
   private var exitButton1: Button = _
   @FXML
-  private var exitButton2: Button = _
-  @FXML
-  private var gameTitle: Label = _
-  @FXML
-  private var randomMove: Button = _
-  //private var state: TextFlow = _
-  @FXML
-  private var board: GridPane = _
+  private var option: Button = _
 
-  @FXML
-  private var label1: AnchorPane = _
 
-  @FXML
-  private var label2: AnchorPane = _
+
 
 
   // Main Menu!
@@ -49,6 +41,9 @@ class SceneController {
     val root: Parent = loader.load()
     val stage = startButton.getScene.getWindow.asInstanceOf[Stage]
     stage.setScene(new Scene(root))
+
+    //switch to game
+    GameEngine.startGame()
   }
 
   def exitMenu(): Unit = {
@@ -57,18 +52,31 @@ class SceneController {
     println("Shutting down...")
   }
 
-//  @FXML
-//  private var rect00: Rectangle = _
-//  private var rect01: Rectangle = _
-//  private var rect02: Rectangle = _
-//  private var rect03: Rectangle = _
-//  private var rect04: Rectangle = _
-//  private var rect10: Rectangle = _
-//  private var rect11: Rectangle = _
-//  private var rect12: Rectangle = _
-//  private var rect13: Rectangle = _
-//  private var rect14: Rectangle = _
-//  private var rect20: Rectangle = _
+  def switchToOptions() = {
+    val loader = new FXMLLoader(getClass.getResource("options.fxml"))
+    val root: Parent = loader.load()
+    val stage = option.getScene.getWindow.asInstanceOf[Stage]
+    stage.setScene(new Scene(root))
+
+    //switch to game
+    //GameEngine.options()
+  }
+
+
+
+
+
+
+  @FXML
+  private var state: TextFlow = _
+  @FXML
+  private var label2: AnchorPane = _
+  @FXML
+  private var randomMove: Button = _
+  @FXML
+  private var board: GridPane = _
+  @FXML
+  private var exitButton2: Button = _
 
   // gameBoard!
   def randomPlay(): Unit = {
@@ -76,33 +84,26 @@ class SceneController {
     //println("Jogada aleatória!") TEXTFLOW
   }
 
+  def play(): Unit = {
+    //    val event = javafx.scene.input.MouseEvent
+    //    val clickedNode = event.getPickResult.getIntersectedNode
+    //    if(clickedNode != board) {
+    //      val colIndex = GridPane.getColumnIndex(clickedNode)
+    //      val rowIndex = GridPane.getRowIndex(clickedNode)
+    //      println("Mouse clicked on: " + colIndex + ", " + rowIndex)
+    val circle = new Circle()
+    circle.setRadius(30)
+    circle.setFill(Color.BLACK)
+    board.add(circle,1,3)
+  }
+
+  //val play = (x,y)
+  //val gameState = GameEngine.
+  //GameEngine.play(play, )
+
   def exitGame(): Unit = {
     val stage = label2.getScene.getWindow
     stage.hide()
     println("Shutting down...")
-  }
-
-  def showCredits(): Unit = {
-    // Carrega a imagem a partir dos resources
-    val imageUrl = getClass.getResource("/credits.png")
-    if (imageUrl == null) {
-      println("Imagem credits.png não encontrada!")
-      return
-    }
-
-    val image = new Image(imageUrl.toExternalForm)
-    val imageView = new ImageView(image)
-
-    // Ajusta o tamanho se necessário
-    imageView.setPreserveRatio(true)
-    imageView.setFitWidth(500)  // podes ajustar isto
-
-    val root = new StackPane(imageView)
-    val scene = new Scene(root, 600, 400)  // tamanho da janela
-
-    val stage = new Stage()
-    stage.setTitle("Créditos")
-    stage.setScene(scene)
-    stage.show()
   }
 }
