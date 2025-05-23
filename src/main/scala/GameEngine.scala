@@ -457,7 +457,7 @@ object GameEngine {
       val (capturedBoard, captured)  = getGroupStones(board, player, coordJogada)
 
       if(player == Stone.White){
-        gameStateAtual= novaJogada(gameStateAtual.toWin, gameStateAtual.captureWhite+captured, gameStateAtual.captureBlack, capturedBoard, novasLivres, Stone.Black)
+        novaJogada(gameStateAtual.toWin, gameStateAtual.captureWhite+captured, gameStateAtual.captureBlack, capturedBoard, novasLivres, Stone.Black)
 
         val optStone = seGanhou()
         val winner = optStone.getOrElse(None)
@@ -470,7 +470,7 @@ object GameEngine {
         }
       }
       else{ //se for o jogador preto
-        gameStateAtual= novaJogada(gameStateAtual.toWin, gameStateAtual.captureWhite, gameStateAtual.captureBlack+captured, capturedBoard, novasLivres, Stone.White)
+        novaJogada(gameStateAtual.toWin, gameStateAtual.captureWhite, gameStateAtual.captureBlack+captured, capturedBoard, novasLivres, Stone.White)
 
         val optStone = seGanhou()
         val winner = optStone.getOrElse(None)
