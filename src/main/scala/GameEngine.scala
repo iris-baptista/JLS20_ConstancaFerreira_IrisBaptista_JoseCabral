@@ -7,7 +7,7 @@ object GameEngine {
   type Board = List[List[Stone]]
   type Coord2D = (Int, Int)
 
-  type GameState = (Board, List[Coord2D])
+  //type GameState = (Board, List[Coord2D])
   var jogadas: List[GameState] = List()
   var peca: Boolean = true //vou usar isto para mudar das peças brancas para as pretas e vice versa
 
@@ -170,31 +170,272 @@ object GameEngine {
 
 
   //T5
+  //captura pecas (se da)
+  //devolve um novo tabuleiro sem a(s) peça(s) capturadas (o espaco fica vazio) e o número de peças capturadas
+  //player e a peca jogada, coordenada e onde foi jogada
+  //podemos passar o gameState?
+  def getGroupStones(board: Board, player: Stone, playerCoord: Coord2D) : (Board, Int) = {
+    //fns para recursao
+    //devolve pecas q estao a volta da coord passada
+    def getSurroundingStones(coord: Coord2D): List[Coord2D] = {
+      @tailrec //verifica q as posicoes estao validas
+      def getValidCoord(currentPossible: List[Coord2D], valid: List[Coord2D]) : List[Coord2D] = {
+        currentPossible match {
+          case Nil => return valid
+          case x :: xs => {
+            val linha = x._1
+            val coluna = x._2
+
+            if(linha > -1 && linha < board.size && coluna > -1 && coluna < board.head.size){
+              getValidCoord(xs, x::valid)
+            }
+            else{
+              getValidCoord(xs, valid)
+            }
+          }
+        }
+      }
+
+      val linha = coord._1
+      val coluna = coord._2
+
+      val possible= List((linha-1, coluna), (linha, coluna-1), (linha, coluna+1), (linha+1, coluna))
+      getValidCoord(possible, List())
+    }
+
+    @tailrec //encontra todas as pecas do outro jogador a volta da peca jogada (pode ter mais q uma)
+    def findOpponent(surroundingCoord: List[Coord2D], currentCoord: List[Coord2D]): List[Coord2D] = {
+      surroundingCoord match{
+        case Nil => currentCoord
+        case x :: xs => {
+          val linha = x._1
+          val coluna = x._2
+
+          val stone= board(linha)(coluna)
+          if(stone != Stone.Empty && stone != player){ //se for o opponent
+            findOpponent(xs, x::currentCoord) //addiciona a coordenada a lista antes de continuar a percurrer
+          }
+          else{ //caso contrario continua a verificar as outras coordenadas
+            findOpponent(xs, currentCoord)
+          }
+        }
+      }
+    }
+
+    //encontra um grupo de pecas do opponent, e as liberdades do grupo
+    //primeira lista devolvida contem as liberties do grupo, segunda contem todas as pedras do grupo
+    def findGroup(currentStones: List[Coord2D], liberties: List[Coord2D], stones: List[Coord2D]): (List[Coord2D], List[Coord2D]) = {
+      currentStones match { //current stones so tem stones do opponent
+        case Nil => (liberties, stones) //se ja nao ha mais para visitar
+        case x::xs => {
+          if(stones.contains(x)){ //se estamos a repetir uma pedra na recursao q ja verificamos
+            findGroup(xs, liberties, stones) //passar atual e continuar recursao
+          }
+          else{
+            val surrounding= getSurroundingStones(x) //encontrar pecas a volta da atual (opponent)
+            val otherMembers= findOpponent(surrounding, List()) //encontrar todas as posicoes q nao tem uma peca igual a atual
+            val libertiesFound= getLiberties(surrounding, List()) //nas pecas iguais marcar as liberdades
+
+            //repetir chamada juntado pecas q podem ser parte do grupo ao currentStones, e atualizando as liberties/stones
+            findGroup(joinLists(xs,otherMembers), joinLists(libertiesFound, liberties), x::stones)
+          }
+        }
+      }
+    }
+
+    //encontra as coordenadas das liberties a volta de um grupo, dado as coordenadas das pecas no grupo
+    def getLiberties(surroundingCoord: List[Coord2D], currentLiberties: List[Coord2D]) : List[Coord2D] = {
+      surroundingCoord match{
+        case Nil => currentLiberties
+        case x :: xs => {
+          val linha = x._1
+          val coluna = x._2
+
+          val stone= board(linha)(coluna)
+          if(stone == player || stone == Stone.Empty){ //se nao for o apponent
+            getLiberties(xs, x::currentLiberties) //adicinar a lista de liberties e continua a percurrer as coordenadas dadas
+            //assim adiciouna espacos vazios e espacos com o proprio jogador
+          }
+          else{ //caso contrario continuar a percurrer
+            getLiberties(xs, currentLiberties)
+          }
+        }
+      }
+    }
+
+    //junta as listas dadas de forma a nao ter valores repetidos
+    def joinLists(newL: List[Coord2D], currentL: List[Coord2D]): List[Coord2D] = {
+      newL match{
+        case Nil => currentL
+        case x::xs => {
+          if(currentL.contains(x)){ //se ja tem o valor
+            joinLists(xs, currentL) //passa valor e continuar a percurrer
+          }
+          else{ //se nao tem o valor concatena a coordenada
+            joinLists(xs, x::currentL)
+          }
+        }
+      }
+    }
+
+    @tailrec //verifica se as liberties foram todas preenchidas pelo jogador (se capturou o grupo)
+    def checkLiberties(coordenadasLeft: List[Coord2D]): Boolean = {
+      coordenadasLeft match {
+        case Nil => true //se todas tinham pecas do jogador
+        case x::xs =>
+          val linha= x._1
+          val coluna= x._2
+
+          val liberty= board(linha)(coluna)
+          if(liberty != player){ //se nao tem uma peca do jogador
+            false
+          }
+          else{
+            checkLiberties(xs)
+          }
+      }
+    }
+
+    @tailrec //tira as pecas dadas do ecra
+    def atualizarBoard(currentBoard: Board, coordenadas: List[Coord2D]): Board = {
+      coordenadas match{
+        case Nil => currentBoard
+        case x::xs => {
+          val linha= x._1
+          val coluna= x._2
+
+          def removeStone(remainingBoard: Board, currentLine: Int): Board = {
+            remainingBoard match { //vai a procura da linha
+              case Nil => Nil
+              case y :: ys =>
+                if (currentLine == linha) {
+                  val newLine = alterLine(y, 0)
+                  newLine :: ys
+                }
+                else {
+                  y :: removeStone(ys, currentLine+1)
+                }
+            }
+          }
+
+          def alterLine(line: List[Stone], currentCol: Int): List[Stone] = {
+            line match {
+              case Nil => Nil
+              case y :: ys =>
+                if (currentCol == coluna) {
+                  Stone.Empty :: ys
+                }
+                else {
+                  y :: alterLine(ys, currentCol+1)
+                }
+            }
+          }
+
+          atualizarBoard(removeStone(currentBoard, 0), xs)
+
+        }
+      }
+    }
+
+    //verifica cada grupo de pecas do adversario para ver se foram capturados
+    def checkGroups(possibleGroups: List[Coord2D], workingBoard: Board, currentCaptured: Int): (Board, Int) = {
+      possibleGroups match{
+        case Nil => (workingBoard, currentCaptured) //se nao encontrou nenhum grupo capturado
+        case x::xs => {
+          val (liberties, stones)= findGroup(List(x), List(), List())
+          val captured= checkLiberties(liberties)
+
+          if(captured){
+            val novoBoard= atualizarBoard(workingBoard, stones)
+            val total= stones.size
+
+            checkGroups(xs, novoBoard, total+currentCaptured)
+          }
+          else{ //se nao capturou as pecas, devolve como estava
+            checkGroups(xs, workingBoard, currentCaptured)
+          }
+        }
+      }
+    }
+
+    //codigo principal
+    val surrounding= getSurroundingStones(playerCoord)
+    val opponents= findOpponent(surrounding, List())
+    checkGroups(opponents, board, 0)
+  }
 
   //T6
+  //verifica se o computador ou o jogador ganhou o jogo (ou seja, se já foram capturadas o número de peças necessárias)
+  def seGanhou(gameState: GameState): Option[Stone] = {
+    val toWin= gameState.toWin
+    val captureW= gameState.captureWhite
+    val captureB= gameState.captureBlack
+
+    if(captureW == toWin){ //se branco ganhou
+      return Some(Stone.White) //vou assumir q devolvemos a stone para o jogador q ganho
+    }
+
+    if(captureB == toWin){ //se o preto ganhou
+      return Some(Stone.Black)
+    }
+
+    //se nao encontrou
+    None //nao precisa da palavra return
+  }
+
 
   //os acima sao da concha :D
 
   //T7
+//como eu fazia antes(mal)
+//  def timer(): Unit = {
+//    val inicio = System.currentTimeMillis()
+//    val joever = 15 * 1000 // 15 segundos em milissegundos pq ya
+//
+//    @tailrec //confio q ponho aqui
+//    def espera(): Unit = {
+//      val agora = System.currentTimeMillis()
+//      if (agora - inicio < joever) {
+//        espera() // chamada recursiva da cena
+//      }
+//    }
+//
+//    println("timer iniciado confia")
+//    espera()
+//    println("its joever")
+//    changeTurno()
+//
+//  }
 
-  def timer(): Unit = {
-    val inicio = System.currentTimeMillis()
-    val joever = 15 * 1000 // 15 segundos em milissegundos pq ya
 
-    @tailrec //confio q ponho aqui
-    def espera(): Unit = {
-      val agora = System.currentTimeMillis()
-      if (agora - inicio < joever) {
-        espera() // chamada recursiva da cena
+  //pelos threads (em grande parte do chat)
+  def timer(): Unit = { //versão mais fixe
+    val t = new Thread() {
+      override //override para este exemplo especifico
+      def run(): Unit = {
+        val inicio = System.currentTimeMillis()
+        val joever = 15 * 1000
+
+        println("timer iniciado confia")
+
+        @tailrec
+        def espera(): Unit = { // espera até os 15s passarem
+          val agora = System.currentTimeMillis()
+          if (agora - inicio < joever) {
+            espera()
+          }
+        }
+
+        espera()
+        println("its joever")
+        //changeTurno()
       }
     }
 
-    println("timer iniciado confia")
-    espera()
-    println("its joever")
-    changeTurno()
-
+    t.start()
   }
+
+
 
   def resetTimer(): Unit = {
     timer()
@@ -202,10 +443,23 @@ object GameEngine {
 
   //System.currentTimeMillis()
 
-  def novaJogada(board: Board, livres: List[Coord2D]): Unit = {
-    //por esta cena antes de cada jogada:   novaJogada(board, lstOpenCoords)
-    jogadas = (board, livres) :: jogadas
+  //def getTime(): Long = System.currentTimeMillis()
+  //da o tempo atual
+
+//  def tempoEsgotado(inicio: Long, limiteSegundos: Int): Boolean = {
+//    val agora =  System.currentTimeMillis()
+//    val decorrido = agora - inicio
+//    decorrido >= limiteSegundos * 1000
+//  }
+
+
+
+  def novaJogada(toWin: Int, captureWhite: Int, captureBlack: Int, board: Board, livres: List[Coord2D]): Unit = {
+    //BUEDA IMPORTANTE
+    val estadoAtual = GameState(toWin, captureWhite, captureBlack, board, livres)
+    jogadas = estadoAtual :: jogadas // Adiciona à head da lista (mais recente primeiro)
   }
+
 
   //achei q podia usar folding, o chat discordou ;_;
   def undo(): Option[GameState] = { //mas dava para deixar tail recursive
@@ -223,12 +477,30 @@ object GameEngine {
   //T8
   //ta bue desorganizado, arruma-se dps
   //
-  def newBoard(): Board = {
-    val board: List[List[Stone]] =
-      List(List(Stone.Empty, Stone.Empty, Stone.Empty),
-        List(Stone.Empty, Stone.Empty, Stone.Empty),
-        List(Stone.Empty, Stone.Empty, Stone.Empty))
-    board
+  def newBoard(a:Int,tempBoard:Board): Board = {
+//    val board: List[List[Stone]] =
+//      List(List(Stone.Empty, Stone.Empty, Stone.Empty),
+//        List(Stone.Empty, Stone.Empty, Stone.Empty),
+//        List(Stone.Empty, Stone.Empty, Stone.Empty))
+
+    if(a<0){
+      newBoard(a-1, createLine(a, Nil):: tempBoard)
+    }else{
+      tempBoard
+    }
+
+  }
+
+  private def createLine(a:Int, temp: List[Stone]):List[Stone] = {
+    if( a < 0){
+      createLine(a-1, Stone.Empty :: temp )
+
+    }else {
+      print(temp)
+      temp
+
+    }
+
   }
 
   def coorLivresIniciais(): List[(Int, Int)] = {
@@ -251,12 +523,14 @@ object GameEngine {
 
 
   //
-  def getCoordsLivres(): List[Coord2D] = {
-    jogadas.headOption match {
-      case Some((_, livres)) => livres
-      case None => coorLivresIniciais()
-    }
-  }
+//  def getCoordsLivres(): List[Coord2D] = {
+//    jogadas.headOption match {
+//      case Some((_, livres)) => livres
+//      case None => coorLivresIniciais()
+//    }
+//  }
+
+
 
 
   def isWaltuh(): Boolean = {
@@ -267,7 +541,7 @@ object GameEngine {
       false
   }
 
-  def isGus(): Boolean = {
+  def isGus(): Boolean = {//completamente inutil xd
     //peças pretas
     if (isWaltuh())
       false
@@ -275,31 +549,32 @@ object GameEngine {
       true
   }
 
-  def changeTurno(): Unit = {
-    resetTimer()
-    if (isWaltuh())
-      peca = false
-    else
-      //muda para as brancas
-      peca = true
-  }
+//  def changeTurno(): Unit = {
+//    resetTimer()
+//    if (isWaltuh())
+//      peca = false
+//    else
+//      //muda para as brancas
+//      peca = true
+//  }
 
   def start(): Unit = {
     //começa o relogio
     //abre o jogo
-    //
-    novaJogada(newBoard(), coorLivresIniciais())
-   // printBoard(newBoard())
-    //timer()
+
+    novaJogada(5,0,0,newBoard(5, Nil), coorLivresIniciais())
+    printBoard(newBoard(5,Nil))
+    println()
+    timer()
 
   }
 
   def restart(): Unit = {
     //recomeça o relógio
     //volta ao inicio
-    novaJogada(newBoard(), coorLivresIniciais())
-    printBoard(newBoard())
-    resetTimer()
+    novaJogada(5,0,0,newBoard(5,Nil), coorLivresIniciais())
+    printBoard(newBoard(5,Nil))
+    //resetTimer()
 
   }
 
@@ -316,6 +591,12 @@ object GameEngine {
 
 
   def main(args: Array[String]): Unit = {
+
+    printBoard(newBoard(5,Nil))
+
+
+
+/*
     start()
 
     val lstOpenCoords: List[Coord2D] = List(
@@ -337,6 +618,8 @@ object GameEngine {
     //println(valor3)
     //println(valor4)
 
+
+
     //    val (coord1, newRand) = randomMove(lstOpenCoords, rand)
     //    val (coord2, nextRand) = randomMove(lstOpenCoords, rand) //igual ao 1
     //    val (coord3, _) = randomMove(lstOpenCoords, nextRand) //differente dos dois
@@ -346,15 +629,51 @@ object GameEngine {
     //    println(s"Terceira coordenada aleatória escolhida: $coord3")
 
 
-    val board = newBoard()
-    novaJogada(board, coorLivresIniciais())
+    //val board = newBoard()
+   // novaJogada(5,0,0,board, coorLivresIniciais())
     //      List(
     //        List(Stone.Empty, Stone.Empty, Stone.Empty),
     //        List(Stone.Empty, Stone.Empty, Stone.Empty),
     //        List(Stone.Empty, Stone.Empty, Stone.Empty)
     //      )
+    //newBoard()
 
-    printBoard(board)
+    //play(board: Board, player: Stone, cNova: Coord2D, cLivres: List[Coord2D]): (Option[Board], List[Coord2D])
+
+    val boardzinho = play(newBoard(5, Nil), Stone.White, (1,0), lstOpenCoords)._1.getOrElse(newBoard(5,Nil))
+    val livrinho = play(boardzinho, Stone.White, (1,0), lstOpenCoords)._2
+
+    //printBoard(play(boardzinho, Stone.White, (1,0), lstOpenCoords))
+    printBoard(play(boardzinho, Stone.White, (1,0), lstOpenCoords)._1.getOrElse(newBoard(5,Nil)))
+
+
+
+    novaJogada(4,0,0,boardzinho, livrinho)
+
+    println()
+    println(jogadas.length)
+    println()
+
+
+    undo() match {
+      case Some(state) => printBoard(state.board)
+      case None => println("Nada para desfazer.")
+    }
+
+    println()
+    println(jogadas.length)
+    println()
+
+
+
+
+    undo() match {
+      case Some(state) => printBoard(state.board)
+      case None => println("Nada para desfazer.")
+    }
+
+    println()
+    println(jogadas.length)
     println()
 
     //    println("timer ligado")
@@ -364,8 +683,8 @@ object GameEngine {
     //novaJogada(board, lstOpenCoords)
 
 
-    val result = play(board, Stone.White, (0, 0), getCoordsLivres())
-    val updatedBoard = printPlayBoard(result)
-
+    //val result = play(board, Stone.White, (0, 0), getCoordsLivres())
+   // val updatedBoard = printPlayBoard(result)
+*/
   }
 }
