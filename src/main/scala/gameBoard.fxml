@@ -14,7 +14,7 @@
          <image>
             <Image url="@tabuleiro.png" />
          </image></ImageView>
-      <GridPane layoutX="41.0" layoutY="45.0">
+      <GridPane fx:id="board" layoutX="41.0" layoutY="45.0" onMouseClicked="#play">
         <columnConstraints>
           <ColumnConstraints hgrow="ALWAYS" minWidth="60.0" prefWidth="60.0" />
             <ColumnConstraints hgrow="ALWAYS" minWidth="60.0" prefWidth="60.0" />

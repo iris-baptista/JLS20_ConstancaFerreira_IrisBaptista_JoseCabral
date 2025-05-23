@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox fx:id="label1" alignment="CENTER" prefHeight="400.0" prefWidth="640.0" spacing="20.0" style="-fx-background-image: url('file:/images/background.jpg');-fx-background-size: cover;-fx-background-position: center;fx-background-repeat: no-repeat;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SceneController">
+<VBox fx:id="label1" alignment="CENTER" prefHeight="400.0" prefWidth="640.0" spacing="20.0" style="-fx-background-image: url('background.jpg');-fx-background-size: cover;-fx-background-position: center;fx-background-repeat: no-repeat;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SceneController">
     <children>
       <Label fx:id="gameTitle" layoutX="246.0" layoutY="60.0" onMouseClicked="#changeColor" text="GO!" textAlignment="CENTER" textFill="WHITE">
          <font>
@@ -13,6 +13,5 @@
       </Label>
         <Button fx:id="startButton" layoutX="235.0" layoutY="175.0" mnemonicParsing="false" onMouseClicked="#switchToGame" prefHeight="25.0" prefWidth="169.0" text="Start Game" />
         <Button layoutX="235.0" layoutY="259.0" mnemonicParsing="false" onMouseClicked="#exitMenu" prefHeight="25.0" prefWidth="169.0" text="Exit" />
-        <Button layoutX="235.0" layoutY="217.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="169.0" text="Options" />
     </children>
 </VBox>

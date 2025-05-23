@@ -6,10 +6,9 @@ object GameEngine {
   type Coord2D = (Int, Int)
 
   var jogadas: List[GameState] = List()
-  var gameStateAtual= GameState(0, 0, 0, Nil, Nil, Stone.Empty) //so para initializar
-  var currentThread= timer() //pode estar initializado mal
+  var gameStateAtual = GameState(0, 0, 0, Nil, Nil, Stone.Empty) //so para initializar
+  var currentThread = new Thread() //pode estar initializado mal
   //var peca: Boolean = true //vou usar isto para mudar das peças brancas para as pretas e vice versa
-
 
   //T1
   //gerar uma coordenada aleatória
@@ -450,7 +449,7 @@ object GameEngine {
     val coordLivres = gameStateAtual.freeCoord
     val player= gameStateAtual.currentPlayer
 
-    val (novoTabuleiro, novasLivres) = play(novoTabuleiro, player, coordJogada, coordLivres)
+    val (novoTabuleiro, novasLivres) = play(tabuleiro, player, coordJogada, coordLivres)
     val optBoard = novoTabuleiro.getOrElse(None)
     if(optBoard != None){ //se jogou numa posicao valida
       val board = novoTabuleiro.get
@@ -486,6 +485,14 @@ object GameEngine {
     else{ //se nao jogou numa posicao valida
       //msg ou nao faz nada?
     }
+  }
+
+  def startGame() = {
+    val (blankBoard, freeCoords) = newBoard(5,Nil,Nil,5)
+    gameStateAtual = GameState(5,0,0,blankBoard, freeCoords, Stone.Black)
+    jogadas = List(gameStateAtual)
+    currentThread.interrupt()
+    currentThread = timer()
   }
 
   //Testes
