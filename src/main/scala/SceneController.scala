@@ -48,9 +48,6 @@ class SceneController {
     val root: Parent = loader.load()
     val stage = option.getScene.getWindow.asInstanceOf[Stage]
     stage.setScene(new Scene(root))
-
-    //switch to game
-    //GameEngine.options()
   }
 
   def exitMenu(): Unit = {
@@ -69,6 +66,8 @@ class SceneController {
   private var board: GridPane = _
   @FXML
   private var exitButton2: Button = _
+  @FXML
+  private var winningLabel: Label= _
 
   // gameBoard!
   def randomPlay(): Unit = {
@@ -95,6 +94,7 @@ class SceneController {
     atualizarEcra(tabuleiro, 0)
     print("Peça jogada!")
     if(GameEngine.winner != Stone.Empty){
+      println("oi")
       switchToGameOver()
     }
   }
@@ -134,11 +134,18 @@ class SceneController {
   def switchToGameOver()={
     val loader = new FXMLLoader(getClass.getResource("gameOver.fxml"))
     val root: Parent = loader.load()
-    val stage = startButton.getScene.getWindow.asInstanceOf[Stage]
+    val stage = label2.getScene.getWindow.asInstanceOf[Stage]
     stage.setScene(new Scene(root))
 
-    //switch to game
-    GameEngine.startGame()
+    println("yolo")
+    if(GameEngine.winner == Stone.White){
+      println("bruh")
+      winningLabel.setText("White has won")
+    }
+    else{
+      winningLabel.setText("Black has won!")
+    }
+
   }
 
   def exitGame(): Unit = {
