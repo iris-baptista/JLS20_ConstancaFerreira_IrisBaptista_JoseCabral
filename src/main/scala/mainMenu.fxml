@@ -4,15 +4,15 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="label1" prefHeight="400.0" prefWidth="638.0" style="-fx-background-image: url('file:/C:/Users/alex2/Downloads/background.jpg');-fx-background-size: cover;-fx-background-position: center;fx-background-repeat: no-repeat;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+<AnchorPane fx:id="label1" prefHeight="400.0" prefWidth="640.0" style="-fx-background-image: url('file:/C:/Users/alex2/Downloads/background.jpg');-fx-background-size: cover;-fx-background-position: center;fx-background-repeat: no-repeat;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SceneController">
     <children>
-        <Button layoutX="235.0" layoutY="175.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="169.0" text="Start Game" />
-        <Button layoutX="235.0" layoutY="259.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="169.0" text="Exit" />
+        <Button fx:id="startButton" layoutX="235.0" layoutY="175.0" mnemonicParsing="false" onMouseClicked="#switchToGame" prefHeight="25.0" prefWidth="169.0" text="Start Game" />
+        <Button layoutX="235.0" layoutY="259.0" mnemonicParsing="false" onMouseClicked="#exitMenu" prefHeight="25.0" prefWidth="169.0" text="Exit" />
         <Button layoutX="235.0" layoutY="217.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="169.0" text="Options" />
-      <Label layoutX="246.0" layoutY="60.0" text="GO!" textAlignment="CENTER" textFill="#d3d3d3">
-         <font>
-            <Font name="Broadway" size="77.0" />
-         </font>
-      </Label>
+        <Label fx:id="gameTitle" layoutX="246.0" layoutY="60.0" onMouseClicked="#changeColor" text="GO!" textAlignment="CENTER" textFill="WHITE">
+            <font>
+                <Font name="Broadway" size="77.0" />
+            </font>
+        </Label>
     </children>
 </AnchorPane>
