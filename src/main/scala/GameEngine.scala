@@ -592,43 +592,43 @@ object GameEngine {
   }
 
 
-  //def play(board: Board, player: Stone, cNova: Coord2D, cLivres: List[Coord2D]): (Option[Board], List[Coord2D])
-  def apedrejar(c:Coord2D, gameState: GameState, player:Stone):GameState={
-    val novoTabuleiro = gameState.board
-    val coorLivres = gameState.freeCoord
-
-    val (novaPlay,novasLivres) = play(novoTabuleiro,player, c, coorLivres)
-    val optBoard = novaPlay.getOrElse(None)
-    if(optBoard != None){
-      val tpoBoard = novaPlay.get
-      val (capturedBoard, captured)  = getGroupStones(tpoBoard, player, c)
-
-      if(player == Stone.White){
-        val novoGameState = novaJogada(gameState.toWin, gameState.captureWhite+captured, gameState.captureBlack, capturedBoard, novasLivres )
-        val optStone = seGanhou(novoGameState)
-        val winner = optStone.getOrElse(None)
-        if(winner != None){
-          println("u suck")
-        }else{
-          //changeTurno()
-        }
-
-      }else{
-        val novoGameState = novaJogada(gameState.toWin, gameState.captureWhite, gameState.captureBlack+captured, capturedBoard, novasLivres )
-        val optStone = seGanhou(novoGameState)
-        val winner = optStone.getOrElse(None)
-        if(winner != None){
-          println("u suck")
-        }else{
-          //changeTurno()
-        }
-
-      }
-
-
-    }
-
-  }
+//  //def play(board: Board, player: Stone, cNova: Coord2D, cLivres: List[Coord2D]): (Option[Board], List[Coord2D])
+//  def apedrejar(c:Coord2D, gameState: GameState, player:Stone):GameState={
+//    val novoTabuleiro = gameState.board
+//    val coorLivres = gameState.freeCoord
+//
+//    val (novaPlay,novasLivres) = play(novoTabuleiro,player, c, coorLivres)
+//    val optBoard = novaPlay.getOrElse(None)
+//    if(optBoard != None){
+//      val tpoBoard = novaPlay.get
+//      val (capturedBoard, captured)  = getGroupStones(tpoBoard, player, c)
+//
+//      if(player == Stone.White){
+//        val novoGameState = novaJogada(gameState.toWin, gameState.captureWhite+captured, gameState.captureBlack, capturedBoard, novasLivres )
+//        val optStone = seGanhou(novoGameState)
+//        val winner = optStone.getOrElse(None)
+//        if(winner != None){
+//          println("u suck")
+//        }else{
+//          //changeTurno()
+//        }
+//
+//      }else{
+//        val novoGameState = novaJogada(gameState.toWin, gameState.captureWhite, gameState.captureBlack+captured, capturedBoard, novasLivres )
+//        val optStone = seGanhou(novoGameState)
+//        val winner = optStone.getOrElse(None)
+//        if(winner != None){
+//          println("u suck")
+//        }else{
+//          //changeTurno()
+//        }
+//
+//      }
+//
+//
+//    }
+//
+//  }
 
 
   def main(args: Array[String]): Unit = {
