@@ -247,21 +247,6 @@ object GameEngine {
       }
     }
 
-    @tailrec //junta as listas dadas de forma a nao ter valores repetidos
-    def joinLists(newL: List[Coord2D], currentL: List[Coord2D]): List[Coord2D] = {
-      newL match{
-        case Nil => currentL
-        case x::xs => {
-          if(currentL.contains(x)){ //se ja tem o valor
-            joinLists(xs, currentL) //passa valor e continuar a percurrer
-          }
-          else{ //se nao tem o valor adiciona a coordenada
-            joinLists(xs, x::currentL)
-          }
-        }
-      }
-    }
-
     @tailrec //verifica se as liberties foram todas preenchidas pelo jogador (se capturou o grupo)
     def checkLiberties(coordenadasLeft: List[Coord2D]): Boolean = {
       coordenadasLeft match {
@@ -325,7 +310,7 @@ object GameEngine {
     //verifica cada grupo de pecas do adversario para ver se foram capturados
     def checkGroups(possibleGroups: List[Coord2D], workingBoard: Board, currentCaptured: Int): (Board, Int) = {
       possibleGroups match{
-        case Nil => (workingBoard, currentCaptured) //se nao encontrou nenhum grupo capturado
+        case Nil => (workingBoard, currentCaptured) //se nao ha mais grupos para verificar
         case x::xs => { //x seria uma peca do opponent
           val (liberties, stones)= findGroup(List(x), List(), List()) //encontra o grupo e as suas liberties
           val captured= checkLiberties(liberties)
@@ -347,6 +332,21 @@ object GameEngine {
     val surrounding= getSurroundingStones(playerCoord) //encontra pecas a volta do jogador
     val opponents= findOpponent(surrounding, List()) //encontra as pecas do opponent a volta do jogador
     checkGroups(opponents, board, 0) //faz captura de grupos (q estao capturados)
+  }
+
+  @tailrec //junta as listas dadas de forma a nao ter valores repetidos
+  def joinLists(newL: List[Coord2D], currentL: List[Coord2D]): List[Coord2D] = {
+    newL match {
+      case Nil => currentL
+      case x :: xs => {
+        if (currentL.contains(x)) { //se ja tem o valor
+          joinLists(xs, currentL) //passa valor e continuar a percurrer
+        }
+        else { //se nao tem o valor adiciona a coordenada
+          joinLists(xs, x :: currentL)
+        }
+      }
+    }
   }
 
   //T6
@@ -380,12 +380,12 @@ object GameEngine {
 
           //se ja passaram os 15 segundos (fez timeout) muda para o proximo jogador
           if(gameStateAtual.currentPlayer == Stone.White){
-            println("Timeout! Vez do jogador Black")
+            println("\nTimeout! Vez do jogador Black")
             gameStateAtual= GameState(gameStateAtual.toWin, gameStateAtual.captureWhite, gameStateAtual.captureBlack, gameStateAtual.board, gameStateAtual.freeCoord, Stone.Black)
             currentThread= timer() //comeca novo timer para proxima jogada
           }
           else{
-            println("Timeout! Vez do jogador White")
+            println("\nTimeout! Vez do jogador White")
             gameStateAtual= GameState(gameStateAtual.toWin, gameStateAtual.captureWhite, gameStateAtual.captureBlack, gameStateAtual.board, gameStateAtual.freeCoord, Stone.White)
             currentThread= timer()
           }
@@ -448,18 +448,44 @@ object GameEngine {
     gameStateAtual= estadoAtual
   }
 
+  def calcNovasLivres(currentB: Board, currentLivres: List[Coord2D], line: Int) : List[Coord2D] = {
+    currentB match{
+      case Nil => currentLivres
+      case x::xs => {
+        val found= checkLine(x, line, 0, Nil)
+        calcNovasLivres(xs, joinLists(currentLivres, found), line+1)
+      }
+    }
+  }
+
+  def checkLine(currentLine: List[Stone], line: Int, col: Int, found: List[Coord2D]): List[Coord2D] = {
+    currentLine match{
+      case Nil => found
+      case x::xs => {
+        if(x == Stone.Empty){
+          checkLine(xs, line, col+1, (line, col)::found)
+        }
+        else{
+          checkLine(xs, line, col+1, found)
+        }
+      }
+    }
+  }
+
   //funcao para completar uma jogada
   def turno(coordJogada: Coord2D): Unit = {
     val tabuleiro = gameStateAtual.board
     val coordLivres = gameStateAtual.freeCoord
+    println(coordLivres)
     val player= gameStateAtual.currentPlayer
 
-    val (novoTabuleiro, novasLivres) = play(tabuleiro, player, coordJogada, coordLivres) //faz uma jogada
+    val (novoTabuleiro, _) = play(tabuleiro, player, coordJogada, coordLivres) //faz uma jogada
     val optBoard = novoTabuleiro.getOrElse(None)
     if(optBoard != None){ //se jogou numa posicao valida
       currentThread.interrupt() //cancela o timer antigo para nao fazer time out
       val board = novoTabuleiro.get
       val (capturedBoard, captured)= getGroupStones(board, player, coordJogada) //captura pecas depois de jogada
+      val novasLivres= calcNovasLivres(capturedBoard, Nil, 0)
 
       if(player == Stone.White){
         //atualiza o numero de pecas q o branco capturou (pode ser 0) e atualiza o proximo jogador (preto)
@@ -502,10 +528,11 @@ object GameEngine {
     val player= gameStateAtual.currentPlayer
 
     val rand = new MyRandom(System.currentTimeMillis())
-    val (novoTabuleiro, _, novasLivres) = playRandomly(tabuleiro, rand, player, coordLivres, randomMove) //joga sempre numa posicao valida
+    val (novoTabuleiro, _, _) = playRandomly(tabuleiro, rand, player, coordLivres, randomMove) //joga sempre numa posicao valida
     val (coordJogada, _)= randomMove(coordLivres, rand) //mesmo seed entao devolve o mesmo valor
 
     val (capturedBoard, captured)= getGroupStones(novoTabuleiro, player, coordJogada) //captura pecas
+    val novasLivres= calcNovasLivres(capturedBoard, Nil, 0)
 
     if(player == Stone.White){
       novaJogada(gameStateAtual.toWin, gameStateAtual.captureWhite+captured, gameStateAtual.captureBlack, capturedBoard, novasLivres, Stone.Black)
@@ -546,43 +573,83 @@ object GameEngine {
     currentThread = timer()
   }
 
+  def tui(): Unit = { //TUI
+    printBoard(gameStateAtual.board)
+
+    println("\nJogada aleatoria- a")
+    println("Jogada normal- j")
+    println("Undo ultima jogada- u")
+    println("Reset ao jogo- r")
+    println("Exit- e")
+    print("Escolher uma: ")
+    val decision = scala.io.StdIn.readChar()
+    println("")
+
+    decision match {
+      case 'a' => {
+        val rand = MyRandom(System.currentTimeMillis())
+        turnoRandom()
+
+        if(winner == Stone.Empty){
+          tui() //repetir ciclo
+        }
+      }
+      case 'j' => {
+        print("Row index (começa a contar por 0): ")
+        val coordX = scala.io.StdIn.readInt()
+        println("")
+        print("Column index (começa a contar por 0): ")
+        val coordY = scala.io.StdIn.readInt()
+        println("")
+        val coord = (coordX, coordY)
+
+        turno(coord)
+
+        if (winner == Stone.Empty) {
+          tui() //repetir ciclo
+        }
+      }
+      case 'u' => {
+        undo()
+        tui()
+      }
+      case 'r' => {
+        startGame()
+        tui()
+      }
+      case 'e' => {
+        sys.exit(0)
+      }
+      case _ => {
+        println("Invalid character!")
+        tui()
+      }
+    }
+  }
+
   //Testes
   def main(args: Array[String]): Unit = {
-    //TUI
+    print("Tempo por jogada: ")
+    val tempo = scala.io.StdIn.readInt() //pede numero de capturas
+    println("")
+    tempoDeJogada= tempo
+
     print("Peças a capturar para ganhar: ")
     val numeroDeCapturas= scala.io.StdIn.readInt() //pede numero de capturas
     println("")
 
-    GameEngine.startGame()
-    GameEngine.printBoard(GameEngine.gameStateAtual.board)
-    while(GameEngine.winner == Stone.Empty){
-      print("Quer fazer uma jogada aleatoria? (true/false): ")
-      val playRandom= scala.io.StdIn.readBoolean()
-      println("")
+    val (blankBoard, freeCoords) = newBoard(5, Nil, Nil, 5) //gera novo tabuleiro e coordenadas livres
+    gameStateAtual = GameState(numeroDeCapturas, 0, 0, blankBoard, freeCoords, Stone.Black) //gameStateInitial
+    jogadas = List(gameStateAtual) //initializar gameState
+    currentThread.interrupt() //vai parrar o thread atual para poder comecar um timer()
+    currentThread = timer()
 
-      if(playRandom){
-        val rand= MyRandom(System.currentTimeMillis())
-        GameEngine.turnoRandom()
-        GameEngine.printBoard(GameEngine.gameStateAtual.board)
-      }
-      else{
-        print("Row index (começa a contar por 0): ")
-        val coordX= scala.io.StdIn.readInt()
-        println("")
-        print("Column index (começa a contar por 0): ")
-        val coordY= scala.io.StdIn.readInt()
-        println("")
-        val coord= (coordX, coordY)
+    tui()
 
-        GameEngine.turno(coord)
-        GameEngine.printBoard(GameEngine.gameStateAtual.board)
-      }
-    }
-
-    if(GameEngine.winner == Stone.Black){
+    if (winner == Stone.Black) {
       println("Black is the winner!")
     }
-    else{ //se for o jogador branco q ganhou
+    else { //se for o jogador branco q ganhou
       println("White is the winner!")
     }
   }

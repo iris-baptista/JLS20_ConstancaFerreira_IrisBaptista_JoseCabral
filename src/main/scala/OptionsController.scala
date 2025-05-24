@@ -39,10 +39,8 @@ class OptionsController {
 
   @FXML
   var tempoTextField: TextField = _ //campo de texto para o usuário indicar o tempo
-
   @FXML
   var capturasTextField: TextField = _ //campo de texto para o numero de pecas a capturar
-
 
   @FXML
   def mudarTempoDeJogada(): Unit = {

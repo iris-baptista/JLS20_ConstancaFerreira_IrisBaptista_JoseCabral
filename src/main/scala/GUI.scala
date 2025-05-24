@@ -1,7 +1,5 @@
-/*import javafx.application.Application
+import javafx.application.Application
 import javafx.fxml.FXMLLoader
-import javafx.scene.input.MouseEvent
-import javafx.scene.layout.GridPane
 import javafx.scene.{Parent, Scene}
 import javafx.stage.Stage
 
@@ -21,4 +19,4 @@ object FxApp {
   def main(args: Array[String]) = {
     Application.launch(classOf[GUI], args: _*)
   }
-}*/
+}

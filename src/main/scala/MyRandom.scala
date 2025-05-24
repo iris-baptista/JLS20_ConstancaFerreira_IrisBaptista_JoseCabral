@@ -18,7 +18,6 @@ case class MyRandom(seed: Long) { //seed equivalente a x na equacao y=f(x)
     val newRandom = MyRandom(newSeed)
     if(valorGerado >= sizeList || valorGerado < 0){ //se gerou um dos valores out of bounds
       if(limit == counter){ //to prevent overflowing the buffer/stack
-        print("hi")
         (0, newRandom)
       }
       else{
@@ -33,7 +32,7 @@ case class MyRandom(seed: Long) { //seed equivalente a x na equacao y=f(x)
 
   def getBits(max: Int, bitsPossible: Int): Int = {
     if(pow(2, bitsPossible-1).intValue >= max){ //se o exponencial de 2 menor/igual ainda for maior q o limite max
-      if(bitsPossible == 1){
+      if(bitsPossible == 1){ //para impedir stack overflow (e de entrar em numero negativos)
         bitsPossible
       }
       else{

@@ -130,10 +130,6 @@ class SceneController {
         }
         else {
           circle.setOpacity(0) //peca fica "invisivel" (mas ainda da para ter interacao com a peca!
-
-          //atualiza lista de coordenadas livres para incluir esta posicao
-          val old= GameEngine.gameStateAtual
-          GameEngine.gameStateAtual= GameState(old.toWin, old.captureWhite, old.captureBlack, old.board, (rowIndex, colIndex)::old.freeCoord, old.currentPlayer)
         }
 
         atualizarLinha(xs, rowIndex, colIndex+1)
