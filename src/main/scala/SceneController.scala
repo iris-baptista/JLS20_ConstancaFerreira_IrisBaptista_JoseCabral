@@ -1,7 +1,7 @@
 import javafx.fxml.{FXML, FXMLLoader}
 import javafx.scene.control.{Button, Label}
 import javafx.application.Platform
-import javafx.scene.layout.{AnchorPane, GridPane, VBox}
+import javafx.scene.layout.{GridPane, VBox, HBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.text.{Text, TextFlow}
@@ -59,7 +59,7 @@ class SceneController {
 
   //GameBoard!
   @FXML
-  private var label2: AnchorPane = _
+  private var label2: HBox = _
   @FXML
   private var textBox: TextFlow = _
 
