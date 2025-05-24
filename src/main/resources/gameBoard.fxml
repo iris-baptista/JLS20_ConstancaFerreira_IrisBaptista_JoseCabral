@@ -8,8 +8,10 @@
 
 <AnchorPane fx:id="label2" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url('background.jpg');-fx-background-size: cover;-fx-background-position: center;fx-background-repeat: no-repeat;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SceneController">
    <children>
-      <TextFlow layoutX="409.0" layoutY="31.0" prefHeight="285.0" prefWidth="163.0" style="-fx-background-color: linear-gradient(to top,Grey, LightGrey); -fx-border-color: LightSlateGrey;" />
-      <Button layoutX="409.0" layoutY="332.0" mnemonicParsing="false" onMouseClicked="#randomPlay" prefHeight="25.0" prefWidth="117.0" text="Random Move" />
+       <TextFlow fx:id="state" layoutX="409.0" layoutY="31.0" prefHeight="285.0" prefWidth="163.0"
+                 style="-fx-background-color: linear-gradient(to top,Grey, LightGrey); -fx-border-color: LightSlateGrey;" />
+
+       <Button layoutX="409.0" layoutY="332.0" mnemonicParsing="false" onMouseClicked="#randomPlay" prefHeight="25.0" prefWidth="117.0" text="Random Move" />
       <Button fx:id="exitButton2" layoutX="537.0" layoutY="332.0" mnemonicParsing="false" onMouseClicked="#exitGame" text="Exit" />
       <ImageView fitHeight="300.0" fitWidth="300.0" layoutX="41.0" layoutY="45.0" pickOnBounds="true" preserveRatio="true">
          <image>

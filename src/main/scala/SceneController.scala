@@ -6,11 +6,14 @@ import javafx.application.Platform
 import javafx.scene.layout.{AnchorPane, GridPane, VBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
-import javafx.scene.text.TextFlow
+import javafx.scene.text.{Text, TextFlow}
 import javafx.scene.{Parent, Scene}
 import javafx.stage.Stage
 import GameEngine.Board
 import Stone.Stone
+import com.sun.org.apache.xalan.internal.xsltc.runtime.BasisLibrary.consoleOutput
+
+import scala.sys.process.processInternal.OutputStream
 
 class SceneController {
   @FXML
@@ -58,6 +61,7 @@ class SceneController {
 
   @FXML
   private var state: TextFlow = _
+
   @FXML
   private var label2: AnchorPane = _
   @FXML
@@ -99,6 +103,12 @@ class SceneController {
     }
   }
 
+  def printToConsole(message: String): Unit = {
+    val text = new javafx.scene.text.Text(message + "\n")
+    state.getChildren.add(text)
+  }
+
+
   def atualizarEcra(boardAtual: Board, rowIndex: Int): Unit={
     boardAtual match {
       case Nil => println("Ecrã atualizado!")
@@ -130,23 +140,25 @@ class SceneController {
       }
     }
   }
-
-  def switchToGameOver()={
+  def switchToGameOver(): Unit = {
     val loader = new FXMLLoader(getClass.getResource("gameOver.fxml"))
     val root: Parent = loader.load()
+
+    // obter o controller associado ao gameOver.fxml
+    val controller = loader.getController[SceneController]
+
+    // alterar a label através do controller
+    if (GameEngine.winner == Stone.White) {
+      controller.winningLabel.setText("White has won")
+    } else {
+      controller.winningLabel.setText("Black has won!")
+    }
+
+    // mudar a cena
     val stage = label2.getScene.getWindow.asInstanceOf[Stage]
     stage.setScene(new Scene(root))
-
-    println("yolo")
-    if(GameEngine.winner == Stone.White){
-      println("bruh")
-      winningLabel.setText("White has won")
-    }
-    else{
-      winningLabel.setText("Black has won!")
-    }
-
   }
+
 
   def exitGame(): Unit = {
     GameEngine.currentThread.interrupt()
@@ -168,5 +180,7 @@ class SceneController {
     GameEngine.startGame() // Reinicia o estado do jogo
     atualizarEcra(GameEngine.gameStateAtual.board, 0)
   }
+
+
 
 }
