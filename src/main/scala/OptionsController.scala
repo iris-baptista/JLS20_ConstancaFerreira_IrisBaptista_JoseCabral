@@ -1,4 +1,4 @@
-import javafx.fxml.{FXML, FXMLLoader}
+/*import javafx.fxml.{FXML, FXMLLoader}
 import javafx.geometry.Pos
 import javafx.scene.control.{Button, TextField}
 import javafx.scene.image.{Image, ImageView}
@@ -100,4 +100,4 @@ class OptionsController {
         println("Erro ao carregar o menu principal.")
     }
   }
-}
+}*/

@@ -13,7 +13,7 @@ case class MyRandom(seed: Long) { //seed equivalente a x na equacao y=f(x)
     val valorGerado = (newSeed >>> shifts).toInt //>>> faz shift right para limitar o valor
 
     val newRandom = MyRandom(newSeed)
-    if(valorGerado > sizeList || valorGerado < 0){ //se gerou um dos valores out of bounds
+    if(valorGerado >= sizeList || valorGerado < 0){ //se gerou um dos valores out of bounds
       newRandom.nextInt(sizeList)
     }
     else {
@@ -22,7 +22,7 @@ case class MyRandom(seed: Long) { //seed equivalente a x na equacao y=f(x)
   }
 
   def getBits(max: Int, bitsPossible: Int): Int = {
-    if(pow(2, bitsPossible-1).intValue >= max){ //se o exponencial de 2 menor/igual ainda for maior q o limite max
+    if(pow(2, bitsPossible-1).intValue >= max || bitsPossible == 1){ //se o exponencial de 2 menor/igual ainda for maior q o limite max
       getBits(max, bitsPossible-1) //repete com o exponencial menor
     }
     else{ //se o exponencial de 2 menor for menor q o limite max (nao inclui todos os indexes da lista)

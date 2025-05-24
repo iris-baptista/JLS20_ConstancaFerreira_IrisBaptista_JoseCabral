@@ -381,10 +381,12 @@ object GameEngine {
           //se ja passaram os 15 segundos (fez timeout) muda para o proximo jogador
           if(gameStateAtual.currentPlayer == Stone.White){
             gameStateAtual= GameState(gameStateAtual.toWin, gameStateAtual.captureWhite, gameStateAtual.captureBlack, gameStateAtual.board, gameStateAtual.freeCoord, Stone.Black)
+            println("Agora é a vez do Black")
             currentThread= timer() //comeca novo timer para proxima jogada
           }
           else{
             gameStateAtual= GameState(gameStateAtual.toWin, gameStateAtual.captureWhite, gameStateAtual.captureBlack, gameStateAtual.board, gameStateAtual.freeCoord, Stone.White)
+            println("Agora é a vez do White")
             currentThread= timer()
           }
         }
@@ -500,10 +502,14 @@ object GameEngine {
     val player= gameStateAtual.currentPlayer
 
     val rand = new MyRandom(System.currentTimeMillis())
+    println("Hi")
     val (novoTabuleiro, _, novasLivres) = playRandomly(tabuleiro, rand, player, coordLivres, randomMove) //joga sempre numa posicao valida
     val (coordJogada, _)= randomMove(coordLivres, rand) //mesmo seed entao devolve o mesmo valor
 
     val (capturedBoard, captured)= getGroupStones(novoTabuleiro, player, coordJogada) //captura pecas
+
+    println("captured:")
+    printBoard(capturedBoard)
 
     if(player == Stone.White){
       novaJogada(gameStateAtual.toWin, gameStateAtual.captureWhite+captured, gameStateAtual.captureBlack, capturedBoard, novasLivres, Stone.Black)
@@ -546,31 +552,41 @@ object GameEngine {
 
   //Testes
   def main(args: Array[String]): Unit = {
-    val board = List(
-      List(Stone.Black, Stone.White, Stone.Empty, Stone.Empty, Stone.Empty),
-      List(Stone.Empty, Stone.White, Stone.Black, Stone.Empty, Stone.Empty),
-      List(Stone.White, Stone.Empty, Stone.Black, Stone.Empty, Stone.Empty),
-      List(Stone.White, Stone.Empty, Stone.Black, Stone.Empty, Stone.Empty),
-      List(Stone.Empty, Stone.Empty, Stone.Empty, Stone.Empty, Stone.Empty))
-
-    println("Board Inicial:")
-    printBoard(board)
+    print("Peças a capturar para ganhar: ")
+    val numeroDeCapturas= scala.io.StdIn.readInt() //pede numero de capturas
     println("")
 
-    val lstOpenCoords: List[Coord2D] = List((0, 2), (0, 3), (0, 4), (1, 0), (1, 3), (1, 4), (2, 1), (2, 3),
-        (2,4), (3, 1), (3, 3), (3,4), (4, 0), (4, 1), (4,2), (4,3), (4,4))
+    GameEngine.startGame()
+    GameEngine.printBoard(GameEngine.gameStateAtual.board)
+    while(GameEngine.winner == Stone.Empty){
+      print("Quer fazer uma jogada aleatoria? (true/false): ")
+      val playRandom= scala.io.StdIn.readBoolean()
+      println("")
 
-    val rand = new MyRandom(1L)
-    val player1= Stone.Black
-    val player2= Stone.White
+      if(playRandom){
+        val rand= MyRandom(System.currentTimeMillis())
+        GameEngine.turnoRandom()
+        GameEngine.printBoard(GameEngine.gameStateAtual.board)
+      }
+      else{
+        print("Row index (começa a contar por 0): ")
+        val coordX= scala.io.StdIn.readInt()
+        println("")
+        print("Column index (começa a contar por 0): ")
+        val coordY= scala.io.StdIn.readInt()
+        println("")
+        val coord= (coordX, coordY)
 
-    val (nextBoard, nextRand, nextLstOpenCoords) = playRandomly(board, rand, player1, lstOpenCoords, randomMove)
-    println("Player 1 Moves!")
-    printBoard(nextBoard)
-    println("")
+        GameEngine.turno(coord)
+        GameEngine.printBoard(GameEngine.gameStateAtual.board)
+      }
+    }
 
-    val (newBoard, newRand, newLstOpenCoords) = playRandomly(nextBoard, nextRand, player2, nextLstOpenCoords, randomMove)
-    println("Player 2 Moves!")
-    printBoard(newBoard)
+    if(GameEngine.winner == Stone.Black){
+      println("Black is the winner!")
+    }
+    else{ //se for o jogador branco q ganhou
+      println("White is the winner!")
+    }
   }
 }

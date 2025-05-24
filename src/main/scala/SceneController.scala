@@ -1,4 +1,4 @@
-import javafx.fxml.{FXML, FXMLLoader}
+/*import javafx.fxml.{FXML, FXMLLoader}
 import javafx.scene.control.{Button, Label}
 import javafx.application.Platform
 import javafx.scene.layout.{AnchorPane, GridPane, VBox}
@@ -188,4 +188,4 @@ class SceneController {
   //GameOver
   @FXML
   private var winningLabel: Label = _
-}
+}*/
