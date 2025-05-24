@@ -544,33 +544,35 @@ object GameEngine {
     currentThread = timer()
   }
 
-  //Testes
-  def main(args: Array[String]): Unit = {
-    val board = List(
-      List(Stone.Black, Stone.White, Stone.Empty, Stone.Empty, Stone.Empty),
-      List(Stone.Empty, Stone.White, Stone.Black, Stone.Empty, Stone.Empty),
-      List(Stone.White, Stone.Empty, Stone.Black, Stone.Empty, Stone.Empty),
-      List(Stone.White, Stone.Empty, Stone.Black, Stone.Empty, Stone.Empty),
-      List(Stone.Empty, Stone.Empty, Stone.Empty, Stone.Empty, Stone.Empty))
 
-    println("Board Inicial:")
-    printBoard(board)
-    println("")
 
-    val lstOpenCoords: List[Coord2D] = List((0, 2), (0, 3), (0, 4), (1, 0), (1, 3), (1, 4), (2, 1), (2, 3),
-        (2,4), (3, 1), (3, 3), (3,4), (4, 0), (4, 1), (4,2), (4,3), (4,4))
-
-    val rand = new MyRandom(1L)
-    val player1= Stone.Black
-    val player2= Stone.White
-
-    val (nextBoard, nextRand, nextLstOpenCoords) = playRandomly(board, rand, player1, lstOpenCoords, randomMove)
-    println("Player 1 Moves!")
-    printBoard(nextBoard)
-    println("")
-
-    val (newBoard, newRand, newLstOpenCoords) = playRandomly(nextBoard, nextRand, player2, nextLstOpenCoords, randomMove)
-    println("Player 2 Moves!")
-    printBoard(newBoard)
-  }
+//  //Testes
+//  def main(args: Array[String]): Unit = {
+//    val board = List(
+//      List(Stone.Black, Stone.White, Stone.Empty, Stone.Empty, Stone.Empty),
+//      List(Stone.Empty, Stone.White, Stone.Black, Stone.Empty, Stone.Empty),
+//      List(Stone.White, Stone.Empty, Stone.Black, Stone.Empty, Stone.Empty),
+//      List(Stone.White, Stone.Empty, Stone.Black, Stone.Empty, Stone.Empty),
+//      List(Stone.Empty, Stone.Empty, Stone.Empty, Stone.Empty, Stone.Empty))
+//
+//    println("Board Inicial:")
+//    printBoard(board)
+//    println("")
+//
+//    val lstOpenCoords: List[Coord2D] = List((0, 2), (0, 3), (0, 4), (1, 0), (1, 3), (1, 4), (2, 1), (2, 3),
+//        (2,4), (3, 1), (3, 3), (3,4), (4, 0), (4, 1), (4,2), (4,3), (4,4))
+//
+//    val rand = new MyRandom(1L)
+//    val player1= Stone.Black
+//    val player2= Stone.White
+//
+//    val (nextBoard, nextRand, nextLstOpenCoords) = playRandomly(board, rand, player1, lstOpenCoords, randomMove)
+//    println("Player 1 Moves!")
+//    printBoard(nextBoard)
+//    println("")
+//
+//    val (newBoard, newRand, newLstOpenCoords) = playRandomly(nextBoard, nextRand, player2, nextLstOpenCoords, randomMove)
+//    println("Player 2 Moves!")
+//    printBoard(newBoard)
+//  }
 }
