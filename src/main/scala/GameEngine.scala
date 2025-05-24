@@ -476,7 +476,6 @@ object GameEngine {
   def turno(coordJogada: Coord2D): Unit = {
     val tabuleiro = gameStateAtual.board
     val coordLivres = gameStateAtual.freeCoord
-    println(coordLivres)
     val player= gameStateAtual.currentPlayer
 
     val (novoTabuleiro, _) = play(tabuleiro, player, coordJogada, coordLivres) //faz uma jogada
